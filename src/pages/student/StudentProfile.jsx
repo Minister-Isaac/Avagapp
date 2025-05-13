@@ -16,9 +16,12 @@ import { IoIosColorPalette } from "react-icons/io";
 import { avatarOptions } from "../../../helper/avatar";
 import { errorNotify, goodNotify } from "../../../helper/ToastLogin";
 import axios_instance from "../../utils/axios";
+import { getUserProfile } from "../../utils/auth";
 
 
 function StudentProfile() {
+  const profile = getUserProfile()
+
   const [viewPassword, setViewPassword] = useState(false);
   const [credentials, setCredentials] = useState({ number:"",email: "", password: "" ,first_name:'', last_name: ''});
 
@@ -114,8 +117,8 @@ function StudentProfile() {
             {...avatarConfig}
           />
           <div className="flex flex-col lg:items-start items-center gap-1">
-            <p className="font-medium text-lg">Alexa Rawles</p>
-            <p className="text-black/50">alexarawles@gmail.com</p>
+            <p className="font-medium text-lg">{profile.first_name} {profile.last_name}</p>
+            <p className="text-black/50">{profile.email}</p>
           </div>
         </div>
         <p

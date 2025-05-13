@@ -61,7 +61,7 @@ export default function Signup() {
     if (formData.password !== formData.confirm_password) {
       return errorNotify("As senhas não coincidem");
     }
-     await axios_instance.post("users/profile/", formData).then((response) => {
+     await axios_instance.post("users/sign-up/", formData).then((response) => {
         goodNotify(response?.message || " Registration successful ");
         navigate(`/auth/sign_in?role=${formData.role}`);
     }

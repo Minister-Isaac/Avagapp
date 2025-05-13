@@ -5,8 +5,11 @@ import { BsFillTrashFill, BsThreeDotsVertical } from 'react-icons/bs';
 import { GoPencil } from "react-icons/go";
 import { IoEyeOutline, IoTriangle } from 'react-icons/io5';
 import { data, TABLE_HEAD, TABLE_ROWS } from "../../../helper/data";
+import { getUserProfile } from "../../utils/auth";
+
 export default function THome() {
     const [identifier, setIdentifier] = useState(null)
+    const profile = getUserProfile()
 
 
  const [Data, setData] = useState(TABLE_ROWS)
@@ -36,7 +39,7 @@ export default function THome() {
         <div className='pr-4 flex px-2 flex-col gap-4'>
             <div className='flex items-center'>
                 <h1 className="text-center -mb-1 text-2xl font-bold">
-                Olá, Faizan Ansari
+                Olá, {profile.first_name} {profile.last_name}
                 </h1>
                 <img src="/teacher/avatar.png" className='size-12' />
             </div>

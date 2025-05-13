@@ -3,9 +3,11 @@ import React, { useState } from 'react'
 import { FaHome } from 'react-icons/fa'
 import { MdEmail } from 'react-icons/md'
 import { Link, useLocation } from 'react-router-dom'
+import { getUserProfile } from "../../utils/auth";
 
 function TSetting() {
-
+    const profile = getUserProfile()
+    
   const location = useLocation()
   const create = location.pathname.includes("admin")
 

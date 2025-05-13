@@ -5,12 +5,15 @@ import { FiSearch } from "react-icons/fi";
 import { IoChevronDownOutline } from "react-icons/io5";
 import { useMobile } from "../../hook/MobileNav";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { getUserProfile } from "../../utils/auth";
 
 export function TNavBar() {
 
+  const profile = getUserProfile()
+
   const navigate = useNavigate()
   const location = useLocation()
-
+ 
   const handleNotification = () => {
     navigate("setting")
     setBell(prev => !prev)
@@ -54,7 +57,7 @@ export function TNavBar() {
           </p>         
           <Link to={ check && "student-profile"} className="text-black/50  text-sm gap-1 flex justify-center items-center">
             <img src="/teacher/doc.png" className="size-6" />
-            <p>Musfiq</p>
+            <p>{profile.first_name} {profile.last_name}</p>
             <IoChevronDownOutline />
           </Link>
         </div>

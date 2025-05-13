@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { AiFillEyeInvisible } from "react-icons/ai";
 import { BsEyeFill } from "react-icons/bs";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useLocation } from "react-router-dom";
 import { sucessNotify, errorNotify } from "../../../helper/ToastLogin";
 import ReCAPTCHA from "react-google-recaptcha";
 import axios_instance from "../../utils/axios";
@@ -12,6 +12,7 @@ export default function SignIn() {
   const [credentials, setCredentials] = useState({ email: "", password: "" });
   const [viewPassword, setViewPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [role, setRole] = useState();
 
   const siteKey = "6Lf4inwqAAAAAD64ITgkHFsgBPk_qvE52l2_6ltd";
   const navigate = useNavigate();
@@ -28,7 +29,16 @@ export default function SignIn() {
   const handleCaptchaChange = (value) => {
     setCaptchaValue(value);
   };
+  const location = useLocation();
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const roleFromQuery = queryParams.get("role");
+    if (roleFromQuery) {
+      setRole(roleFromQuery);
+    }
+  }, [location]);
 
+  console.log("role",role)
   const handleLogin = (e) => {
     e.preventDefault();
 
@@ -40,7 +50,7 @@ export default function SignIn() {
     setLoading(true); // Start loader
 
     axios_instance
-      .post("users/login/", credentials)
+      .post("users/login/", {...credentials,role})
       .then((response) => {
         const { access, user: loggedInUser } = response.data;
         localStorage.setItem("USER_TOKEN", access);

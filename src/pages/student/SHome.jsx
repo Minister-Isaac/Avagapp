@@ -3,13 +3,16 @@ import React from 'react';
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import { IoTriangle } from 'react-icons/io5';
 import { studentData, studentNotify } from "../../../helper/data";
+import { getUserProfile } from "../../utils/auth";
+
 export default function SHome() {
+    const profile = getUserProfile()
 
     return (
         <div className='pr-4 px-3 lg:px-0 flex flex-col gap-4'>
             <div className='flex items-center'>
                 <h1 className="text-center -mb-1 text-2xl font-bold">
-                Olá, Faizan Ansari
+                Olá, {profile.first_name} {profile.last_name}
                 </h1>
                 <img src="/teacher/avatar.png" className='size-12' />
             </div>
