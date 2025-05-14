@@ -38,7 +38,6 @@ export default function SignIn() {
     }
   }, [location]);
 
-  console.log("role",role)
   const handleLogin = (e) => {
     e.preventDefault();
 
@@ -74,7 +73,7 @@ export default function SignIn() {
       })
       .catch((error) => {
         console.error("Login failed:", error);
-        errorNotify(error.response?.data?.message || "Unknown error");
+        errorNotify(error.response?.error || "Unknown error");
         // Handle error response here
       })
       .finally(() => {

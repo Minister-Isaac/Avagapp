@@ -10,7 +10,11 @@ import { NavLink, useLocation } from "react-router-dom";
 import { logout } from "../../utils/logout";
 
 
- const sideLinks = [
+ 
+
+export default function SSideBar() {
+  
+const sideLinks = [
         {
             label: "Início",
             inActive: <MdHome />,
@@ -64,10 +68,6 @@ import { logout } from "../../utils/logout";
             isLogout: true,
         },
     ];
-
-export default function SSideBar() {
-  
-
     const location = useLocation()
 
     const pathSegments = location.pathname.split('/');
@@ -93,11 +93,13 @@ export default function SSideBar() {
             {
                 mobile && (
 
-                    <div className={`  lg:relative absolute z-50 h-screen lg:h-full flex flex-col lg:w-[22%] bg-bg items-center`}>
+                    <div   className={`${
+      mobile ? "absolute z-50" : "hidden lg:flex lg:w-[21%]"
+    } h-screen lg:h-full flex flex-col lg:w-[21%] bg-bg items-center`}>
                         <div>
                             <img src="/teacher/avag.png" className="size-[110px] " alt="" />
                         </div>
-                        <div className="h-full flex flex-col justify-between pb-2 p-2">
+                        <div className="h-full flex flex-col justify-between pb-2 p-2 w-full">
                             <div className="flex flex-col gap-1">
                                 {sideLinks.map((link, id) => {
 
@@ -107,10 +109,12 @@ export default function SSideBar() {
                                         <NavLink
                                             key={id}
                                             to={link.path}
-                                            onClick={toggleMobile}
+                                            onClick={mobile ? toggleMobile : undefined}
                                             // className={({isActive}) => isActive ? "my-auto flex  p-[10px] rounded-lg  bg-main-dark text-white" : "my-auto flex  p-[10px] rounded-lg  bg-transparent text-black"}
-                                            className={` ${pathSegments[3] === hrefSegments[3] && "bg-main-dark text-sm text-white"
-                                                } my-auto flex  p-[10px] text-sm rounded-lg items-center text-black `}
+                                            className={`${
+                pathSegments[3] === hrefSegments[3] &&
+                "bg-main-dark text-sm text-white"
+              } my-auto flex p-[10px] text-sm rounded-lg items-center text-black`}
                                         >
                                             <span >{link.inActive}</span>
                                             <span className="inline  ml-2 ">{link.label}</span>
@@ -122,7 +126,15 @@ export default function SSideBar() {
                                 {config.map((link, id) => (
                                     <NavLink
                                         key={id}
-                                        onClick={toggleMobile}
+                                         onClick={
+              link.isLogout
+                ? async () => {
+                    await handleLogout();
+                  }
+                : mobile
+                ? toggleMobile
+                : undefined
+            }
                                         to={link.path}
                                         className={` ${location.pathname === link.path && "bg-main-dark text-sm text-white"
                                             } my-auto flex  p-[10px] text-sm rounded-lg items-center text-black `}
@@ -151,8 +163,10 @@ export default function SSideBar() {
                                     key={id}
                                     to={link.path}
                                     // className={({isActive}) => isActive ? "my-auto flex  p-[10px] rounded-lg  bg-main-dark text-white" : "my-auto flex  p-[10px] rounded-lg  bg-transparent text-black"}
-                                    className={` ${pathSegments[3] === hrefSegments[3] && "bg-main-dark text-sm text-white"
-                                        } my-auto flex  p-[10px] text-sm rounded-lg items-center text-black `}
+                                     className={`${
+              location.pathname === link.path &&
+              "bg-main-dark text-sm text-white"
+            } my-auto flex p-[10px] text-sm rounded-lg items-center text-black`}
                                 >
                                     <span >{link.inActive}</span>
                                     <span className="inline  ml-2 ">{link.label}</span>
