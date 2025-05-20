@@ -7,7 +7,7 @@ import {
 
 export { API_URL };
 
-const axios_instance = axios.create({ baseURL: BASE_API_URL, timeout: 2000 });
+const axios_instance = axios.create({ baseURL: BASE_API_URL });
 
 axios_instance.interceptors.request.use(
   (config) => {
@@ -32,7 +32,7 @@ axios_instance.interceptors.request.use(
       timestamp: new Date().toISOString(),
     };
 
-    errorCommand(`❌ Request Error: ${JSON.stringify(log_, null, 4)} \n`);
+    console.error(`❌ Request Error: ${JSON.stringify(log_, null, 4)} \n`);
 
     return Promise.reject(error);
   }
@@ -63,7 +63,7 @@ axios_instance.interceptors.response.use(
       timestamp: new Date().toISOString(),
     };
 
-    errorCommand(`❌ Response Error: ${JSON.stringify(log_, null, 4)} \n`);
+    console.error(`❌ Response Error: ${JSON.stringify(log_, null, 4)} \n`);
 
     return Promise.reject(error);
   }

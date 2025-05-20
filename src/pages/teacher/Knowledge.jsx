@@ -1,122 +1,149 @@
-import { Card, List, ListItem, ListItemPrefix } from '@material-tailwind/react'
-import React, { useState } from 'react'
-import { BsFillTrashFill, BsThreeDotsVertical } from 'react-icons/bs'
-import { GoPencil } from 'react-icons/go'
-import { IoEyeOutline } from 'react-icons/io5'
-import { Link } from 'react-router-dom'
-import CreateKnowledge from './CreateKnowledge'
+import React, { useState, useEffect } from "react";
+import CreateKnowledge from "./CreateKnowledge";
+import axios_instance from "../../utils/axios";
+import KnowledgeCardList from "../../components/teacher/KnowledgeCardList";
 
 function Knowledge() {
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [courseData, setCourseData] = useState([]);
+  const [courseDataB, setCourseDataB] = useState([]);
 
-    const [identifier, setIdentifier] = useState(null)
-    const [create, setCreate] = useState(false)
+  const handleCreate = () => setSelectedItem({});
 
-    const CreateKnow = () => {
-        setCreate(prev => !prev)
+
+  const handleEdit = (item) => {
+    setSelectedItem(item);
+  };
+
+  const handleCloseForm = () => {
+    setSelectedItem(null);
+  };
+
+ const handleDelete = async (id, type) => {
+  try {
+    // Send DELETE request to backend
+    await axios_instance.delete(`learning/knowledge-trail/${id}/`);
+
+    // Update frontend state based on type
+    if (type === "A") {
+      setCourseData((prev = []) => prev.filter((item) => item.id !== id));
+    } else {
+      setCourseDataB((prev = []) => prev.filter((item) => item.id !== id));
     }
-    const toogleEdit = (id) => {
-        if (identifier === id) {
-            setIdentifier(null)
-        } else {
-            setIdentifier(id)
+  } catch (error) {
+    console.error("Failed to delete item:", error);
+  }
+};
 
-        }
+  const handleSave = async (formData) => {
+  try {
+    const isEdit = formData.has("id");
+    const config = {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    };
 
+    const response = isEdit
+      ? await axios_instance.put(
+          `learning/knowledge-trail/${formData.get("id")}/`,
+          formData,
+          config
+        )
+      : await axios_instance.post("learning/knowledge-trail/", formData, config);
 
+    const savedItem = response.data;
+
+    // Update courseData
+    setCourseData((prev = []) => {
+      const exists = prev.some((item) => item.id === savedItem.id);
+      return exists
+        ? prev.map((item) => (item.id === savedItem.id ? savedItem : item))
+        : [savedItem, ...prev];
+    });
+
+    // Update recommended list if needed
+    if (savedItem.recommended) {
+      setCourseDataB((prev = []) => {
+        const exists = prev.some((item) => item.id === savedItem.id);
+        return exists
+          ? prev.map((item) => (item.id === savedItem.id ? savedItem : item))
+          : [savedItem, ...prev];
+      });
     }
-    const [courseData, setCourseData] = useState([1, 2, 3, 4, 5, 6])
-    const [courseDataB, setCourseDataB] = useState([1, 4, 3,])
+
+    setSelectedItem(null);
+  } catch (error) {
+    console.error("Error saving item:", error.response || error);
+  }
+};
 
 
-    const handleDelete = async (id, data, updater) => {
+  useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        const response = await axios_instance.get("learning/knowledge-trail/");
+        const results = response.data || [];
+        setCourseData(results);
+        setCourseDataB(results.filter((row) => row.recommended === true));
 
-        const NewData = await data.filter(dat => dat !== id)
-        await updater(NewData)
-    }
+      } catch (error) {
+        console.error("Error fetching students:", error);
+      }
+    };
+    fetchStudents();
+  }, []);
 
-    return (
-        <>
-            {
-                create ? (<CreateKnowledge />) : (
-                    <div className='flex overflow-hidden pt-5 flex-col p-3 gap-2'>
-                        <div className='flex justify-between p-2 items-center text-white'>
-                            <p className='font-bold text-[18px] lg:text-[22px] text-black'>Trilha de Conhecimento</p>
-                            <p onClick={CreateKnow} className='flex cursor-pointer p-[10px] items-center rounded-2xl gap-2 bg-main-dark'>Criar Novo</p>
-                        </div>
-                        <div className='grid  grid-cols-2 lg:grid-cols-4 gap-2 p-3 '>
-                            {
-                                courseData.map((item, index) => (
-                                    <div key={index} className=' p-3 relative mb-4 flex flex-col gap-1 rounded-xl'>
-                                        <img src="/teacher/react.png" className="rounded-full size-14 bg-main-light p-2 absolute -right-2 -top-2 " />
-                                        <img src={`/teacher/course${item}.png`} alt="" />
-                                        <p className='flex justify-between items-end text-lg font-semibold'>
-                                            <span>Física</span>
-                                            <BsThreeDotsVertical onClick={() => toogleEdit(index)} size={15} className=' rotate-90' />
-                                        </p>
-                                        <span className='-mt-1 text-sm text-black/50 '>Atribuído por Sir Haseeb</span>
-                                        <Card onClick={() => toogleEdit(index)} className={` ${identifier === index ? "block" : "hidden"} right-10 -bottom-20 z-50 absolute w-[135px]`}>
-                                            <List className="w-[120px] text-xs "> <ListItem className="text-xs w-[120px]  ">
-                                              <Link className='flex w-full' to={"Know-details"}>
-                                              
-                                               <ListItemPrefix >
-                                                    <IoEyeOutline />
-                                                </ListItemPrefix>
-                                                Ver
-                                              </Link> 
+  return (
+    <>
+      {selectedItem ? (
+        <CreateKnowledge
+          data={selectedItem}
+          onClose={handleCloseForm}
+          onSave={handleSave}
+        />
+      ) : (
+        <div className="flex overflow-hidden pt-5 flex-col p-3 gap-2">
+          <div className="flex justify-between p-2 items-center text-white">
+            <p className="font-bold text-[18px] lg:text-[22px] text-black">
+              Trilha de Conhecimento
+            </p>
+            <p
+              onClick={handleCreate}
+              className="flex cursor-pointer p-[10px] items-center rounded-2xl gap-2 bg-main-dark"
+            >
+              Criar Novo
+            </p>
+          </div>
 
-                                            </ListItem >
-                                                <ListItem onClick={CreateKnow} className=" w-[120px]   text-xs"> <ListItemPrefix >
-                                                    <GoPencil />
-                                                </ListItemPrefix>Editar</ListItem>
-                                                <ListItem onClick={() => handleDelete(item,courseData, setCourseData )} className=" text-xs w-[120px] font-semibold "> <ListItemPrefix >
-                                                    <BsFillTrashFill />
-                                                </ListItemPrefix>Excluir</ListItem>
-                                            </List>
-                                        </Card>
-                                    </div>
-                                ))
-                            }
-                        </div>
-                        <div className='p-2'>
-                            <p className='font-bold text-[18px] lg:text-[22px] text-black'>Trilha de Conhecimento Importante</p>
+          <KnowledgeCardList
+            data={courseData}
+            toogleEdit={(id) => {
+              const item = courseData.find((item) => item.id === id);
+              handleEdit(item);
+            }}
+            handleDelete={(id) => handleDelete(id, "A")}
+            CreateKnow={handleCreate}
+            emptyMessage="Nenhuma trilha de conhecimento disponível ainda."
+          />
 
-                        </div>
-                        <div className='grid  grid-cols-2 lg:grid-cols-4 gap-2 p-3 '>
-                            {
-                                courseDataB.map((item, index) => (
-                                    <div key={index} className=' p-3 relative mb-4 flex flex-col gap-1 rounded-xl'>
-                                        <img src="/teacher/react.png" className="rounded-full size-14 bg-main-light p-2 absolute -right-2 -top-2 " />
-                                        <img src={`/teacher/course${item}.png`} alt="" />
-                                        <p className='flex justify-between items-end text-lg font-semibold'>
-                                            <span>Física</span>
-                                            <BsThreeDotsVertical onClick={() => toogleEdit(index + 10)} size={15} className=' rotate-90' />
-                                        </p>
-                                        <span className='-mt-1 text-sm text-black/50 '>Atribuído por Sir Haseeb</span>
-                                        <Card onClick={() => toogleEdit(index + 10)} className={` ${identifier === index + 10 ? "block" : "hidden"} right-10 -bottom-10 z-50 absolute w-[135px]`}>
-                                            <List className="w-[120px] text-xs "> <ListItem className="text-xs w-[120px]  ">
-                                                <ListItemPrefix >
-                                                    <IoEyeOutline />
-                                                </ListItemPrefix>
-                                                Ver
-
-                                            </ListItem >
-                                                <ListItem onClick={CreateKnow} className=" w-[120px]   text-xs"> <ListItemPrefix >
-                                                    <GoPencil />
-                                                </ListItemPrefix>Editar</ListItem>
-                                                <ListItem onClick={() => handleDelete(item,courseDataB, setCourseDataB )} className=" text-xs w-[120px] font-semibold "> <ListItemPrefix >
-                                                    <BsFillTrashFill />
-                                                </ListItemPrefix>Excluir</ListItem>
-                                            </List>
-                                        </Card>
-                                    </div>
-                                ))
-                            }
-                        </div>
-                    </div>
-                )
-            }
-        </>
-    )
+          <KnowledgeCardList
+            data={courseDataB}
+            offset={10}
+            identifier={selectedItem?.id}
+            toogleEdit={(id) => {
+              const item = courseDataB.find((item) => item.id === id);
+              handleEdit(item);
+            }}
+            handleDelete={(id) => handleDelete(id, "B")}
+            CreateKnow={handleCreate}
+            title="Trilha de Conhecimento Importante"
+            emptyMessage="Nenhuma trilha importante marcada."
+          />
+        </div>
+      )}
+    </>
+  );
 }
 
-export default Knowledge
+export default Knowledge;

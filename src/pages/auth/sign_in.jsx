@@ -49,7 +49,7 @@ export default function SignIn() {
     setLoading(true); // Start loader
 
     axios_instance
-      .post("users/login/", {...credentials,role})
+      .post("api/users/login/", {...credentials,role})
       .then((response) => {
         const { access, user: loggedInUser } = response.data;
         localStorage.setItem("USER_TOKEN", access);
@@ -72,8 +72,7 @@ export default function SignIn() {
         }
       })
       .catch((error) => {
-        console.error("Login failed:", error);
-        errorNotify(error.response?.error || "Unknown error");
+        errorNotify(error.response.data.non_field_errors[0] || error.response?.error || "Unknown error" );
         // Handle error response here
       })
       .finally(() => {
@@ -168,7 +167,7 @@ export default function SignIn() {
             <p className="text-main-dark/70 text-sm lg:text-base 2xl:text-lg">
               Not registered yet?
               <span
-                onClick={() => navigate("/auth/sign_up")}
+                onClick={() => navigate(`/auth/sign_up?role=${role}`)}
                 className="text-main-dark cursor-pointer font-semibold ml-2"
               >
                 Create an account

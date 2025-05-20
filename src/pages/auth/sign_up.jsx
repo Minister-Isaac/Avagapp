@@ -11,14 +11,7 @@ import axios_instance from "../../utils/axios";
 export default function Signup() {
   const [captchaValue, setCaptchaValue] = useState(null);
 
-  const [formData, setFormData] = useState({
-    first_name: "",
-    last_name: "",
-    email: "",
-    password: "",
-    role: "",
-    confirm_password: "",
-  });
+  const [formData, setFormData] = useState({});
   const [viewPassword, setViewPassword] = useState(false);
   const [viewConfirm_password, setViewConfirm_password] = useState(false);
 
@@ -27,7 +20,7 @@ export default function Signup() {
 
   const navigate = useNavigate();
 
-   const toggleConfirmPassword = () => {
+  const toggleConfirmPassword = () => {
     setViewConfirm_password((prev) => !prev);
   };
   const togglePassword = () => {
@@ -61,15 +54,15 @@ export default function Signup() {
     if (formData.password !== formData.confirm_password) {
       return errorNotify("As senhas não coincidem");
     }
-     await axios_instance.post("users/sign-up/", formData).then((response) => {
+    await axios_instance
+      .post("api/users/sign-up/", formData)
+      .then((response) => {
         goodNotify(response?.message || " Registration successful ");
         navigate(`/auth/sign_in?role=${formData.role}`);
-    }
-    ).catch((error) => {
-      console.error("Erro ao registrar:", error);
-      errorNotify(error?.message || "Unknown error");
-    });
-   
+      })
+      .catch((error) => {
+        errorNotify(error.response.data.non_field_errors[0] ||error.response.data.subject_taught[0] || "Unknown error");
+      });
   };
 
   return (
@@ -81,7 +74,11 @@ export default function Signup() {
         />
         <img src="/teacher/signup.png" className="h-screen flex" />
       </div>
-      <div className=" overflow-auto lg:pt-80 pb-5 flex w-full lg:w-[74.5%] 2xl:gap-[30px] lg:gap-[3px] flex-col justify-center items-center h-full ">
+      <div
+        className={`overflow-auto pb-5 flex w-full lg:w-[74.5%] 2xl:gap-[30px] lg:gap-[3px] flex-col justify-center items-center h-full ${
+          formData.role === "teacher" ? "lg:pt-96 2xl:pt-[120px]" : "lg:pt-80"
+        }`}
+      >
         <div className="flex mb-5 lg:mb-0 w-full items-center justify-center">
           <h1 className="text-main-dark text-3xl font-semibold 2xl:text-5xl">
             Bem-vindo
@@ -122,7 +119,6 @@ export default function Signup() {
               value={formData.last_name}
               onChange={handleChange}
               required
-
             />
           </label>
 
@@ -137,7 +133,6 @@ export default function Signup() {
               value={formData.email}
               onChange={handleChange}
               required
-
             />
           </label>
 
@@ -155,7 +150,6 @@ export default function Signup() {
               value={formData.password}
               onChange={handleChange}
               required
-
             />
             <p className="top-[60%] right-3 absolute" onClick={togglePassword}>
               {!viewPassword ? (
@@ -165,11 +159,11 @@ export default function Signup() {
               )}
             </p>
           </label>
-           <label
+          <label
             htmlFor="confirm_password"
             className="relative font-medium text-lg text-main-dark"
           >
-             Confirmar Senha
+            Confirmar Senha
             <input
               type={viewConfirm_password ? "text" : "password"}
               autoComplete="off"
@@ -179,9 +173,11 @@ export default function Signup() {
               value={formData.confirm_password}
               onChange={handleChange}
               required
-
             />
-            <p className="top-[60%] right-3 absolute" onClick={toggleConfirmPassword}>
+            <p
+              className="top-[60%] right-3 absolute"
+              onClick={toggleConfirmPassword}
+            >
               {!viewConfirm_password ? (
                 <BsEyeFill size={20} />
               ) : (
@@ -189,26 +185,63 @@ export default function Signup() {
               )}
             </p>
           </label>
-         
+
+          <div className="flex gap-4">
             <label
               htmlFor="role"
-              className="font-medium text-lg text-main-dark"
+              className="font-medium text-lg text-main-dark flex-1"
             >
               Papel
               <select
                 id="role"
-                 className="text-main-dark/70  mt-[5px] 2xl:px-[18px] lg:px-[10px] px-[7px] 2xl:placeholder:text-base lg:placeholder:text-sm text-sm 2xl:text-base placeholder:text-main-dark/70 border-none active:border-none outline-none bg-input rounded-lg 2xl:rounded-xl w-full py-3 2xl:py-4"
-                value={formData.role}
+                className="text-main-dark/70 mt-[5px] 2xl:px-[18px] lg:px-[10px] px-[7px] 2xl:placeholder:text-base lg:placeholder:text-sm text-sm 2xl:text-base placeholder:text-main-dark/70 border-none active:border-none outline-none bg-input rounded-lg 2xl:rounded-xl w-full py-3 2xl:py-4"
+                value={formData.role || ""}
                 onChange={handleChange}
-              required
-
+                required
               >
                 <option value="">Selecione um papel</option>
-  <option value="teacher">Professor</option>
-  <option value="student">Estudante</option>
-  <option value="admin">Administrador</option>
+                <option value="teacher">Professor</option>
+                <option value="student">Estudante</option>
+                <option value="admin">Administrador</option>
               </select>
             </label>
+
+            {formData?.role === "teacher" && (
+              <label
+                htmlFor="years_experience"
+                className="font-medium text-lg text-main-dark flex-1"
+              >
+                Anos de Experiência
+                <input
+                  type="number"
+                  min={0}
+                  id="experience_years"
+                  placeholder="Anos de Experiência"
+                  className="text-main-dark/70 mt-[5px] 2xl:px-[18px] lg:px-[10px] px-[7px] 2xl:placeholder:text-base lg:placeholder:text-sm text-sm 2xl:text-base placeholder:text-main-dark/70 border-none active:border-none outline-none bg-input rounded-lg 2xl:rounded-xl w-full py-3 2xl:py-4"
+                  value={formData.experience_years || ""}
+                  onChange={handleChange}
+                  required={formData.role === "teacher"}
+                />
+              </label>
+            )}
+          </div>
+          {formData.role === "teacher" && (
+            <label
+              htmlFor="subject"
+              className="font-medium text-lg text-main-dark"
+            >
+              Matéria
+              <input
+                type="text"
+                id="subject_taught"
+                placeholder="Matéria"
+                className="text-main-dark/70 mt-[5px] 2xl:px-[18px] lg:px-[10px] px-[7px] 2xl:placeholder:text-base lg:placeholder:text-sm text-sm 2xl:text-base placeholder:text-main-dark/70 border-none active:border-none outline-none bg-input rounded-lg 2xl:rounded-xl w-full py-3 2xl:py-4"
+                value={formData.subject_taught || ""}
+                onChange={handleChange}
+                required={formData.role === "teacher"}
+              />
+            </label>
+          )}
           <ReCAPTCHA
             className="g-recaptcha -mb-7"
             data-size="compact"
@@ -225,7 +258,10 @@ export default function Signup() {
         </div>
         <p className="w-full cursor-pointer mt-1 text-center">
           Já tem uma conta?{" "}
-          <Link to={"/auth/sign_in"} className="text-main-dark">
+          <Link
+            to={`/auth/sign_in?role=${formData?.role}`}
+            className="text-main-dark"
+          >
             Entre
           </Link>
         </p>

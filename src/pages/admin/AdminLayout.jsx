@@ -1,14 +1,15 @@
 import React from 'react'
 import { Outlet } from 'react-router-dom'
-import ASideBar from './ASideBar'
-import { TNavBar } from '../teacher/TNavBar'
+import SideBar from '../../components/SideBar'
+
+import  NavBar  from '../../components/NavBar'
 
 function AdminLayout() {
     return (
         <div className="flex  w-full h-screen">
-            <ASideBar />
+            <SideBar />
             <main className="overflow-y-auto w-full bg-white">
-                <TNavBar />
+                <NavBar />
                 <Outlet />
             </main>
         </div>

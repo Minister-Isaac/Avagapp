@@ -20,8 +20,6 @@ function AdminKnowledge() {
             setIdentifier(id)
 
         }
-
-
     }
 
 

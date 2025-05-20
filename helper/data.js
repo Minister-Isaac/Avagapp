@@ -63,12 +63,6 @@ export const data = [
   },
   {
     img: "/teacher/thumb.png",
-    label: "Aulas",
-    value: 12,
-    desp: "-4 professores",
-  },
-  {
-    img: "/teacher/thumb.png",
     label: "Lições",
     value: 12,
     desp: "+4 vídeos",

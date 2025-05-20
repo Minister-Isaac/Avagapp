@@ -15,6 +15,8 @@
     "axios": "^1.7.9",
     "dnd-multi-backend": "^8.0.3",
     "formik": "^2.4.6",
+    "i18next": "^25.1.2",
+    "jspdf": "^3.0.1",
     "react": "^18.3.1",
     "react-beautiful-dnd": "^13.1.1",
     "react-confetti": "^6.1.0",
@@ -24,6 +26,7 @@
     "react-dom": "^18.3.1",
     "react-google-recaptcha": "^3.1.0",
     "react-hot-toast": "^2.4.1",
+    "react-i18next": "^15.5.1",
     "react-icons": "^5.5.0",
     "react-router-dom": "^6.28.0",
     "yup": "^1.4.0"

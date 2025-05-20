@@ -3,12 +3,16 @@ import { CgMenuLeft } from "react-icons/cg";
 import { FaRegBell } from "react-icons/fa";
 import { FiSearch } from "react-icons/fi";
 import { IoChevronDownOutline } from "react-icons/io5";
-import { useMobile } from "../../hook/MobileNav";
+import { useMobile } from "../hook/MobileNav";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { getUserProfile } from "../../utils/auth";
+import { getUserProfile } from "../utils/auth";
+import { useTranslation } from 'react-i18next';
+import Avatar from "avataaars";
+import { useAvatarEditorDialog } from "./AvatarEditorDialog/AvatarEditorDialogContext";
 
-export function TNavBar() {
-
+export default function NavBar() {
+ const { t, i18n } = useTranslation();
+ 
   const profile = getUserProfile()
 
   const navigate = useNavigate()
@@ -18,6 +22,8 @@ export function TNavBar() {
     navigate("setting")
     setBell(prev => !prev)
   }
+    const { avatarConfig } = useAvatarEditorDialog();
+  
   
   const create = location.pathname.includes("admin")
 
@@ -43,6 +49,7 @@ export function TNavBar() {
         </div>
   
         <div className="flex  justify-center items-center gap-3">
+
         {
               bell && (  <img src="/teacher/notify.png" onClick={handleNotification} className={`absolute top-10 right-12 size-52 lg:right-[52px] z-50 lg:size-56  ${create ? "hidden" : "block"} `} />)
             }
@@ -56,7 +63,12 @@ export function TNavBar() {
             <span className="size-[5px] top-0 right-[2px] absolute bg-red-600  flex rounded-full"></span>
           </p>         
           <Link to={ check && "student-profile"} className="text-black/50  text-sm gap-1 flex justify-center items-center">
-            <img src="/teacher/doc.png" className="size-6" />
+            <Avatar
+            className="size-9"
+                        // style={{ width: "150px", height: "150px", marginBottom: "20px" }}
+                        avatarStyle="Circle"
+                        {...avatarConfig}
+                      />
             <p>{profile.first_name} {profile.last_name}</p>
             <IoChevronDownOutline />
           </Link>
