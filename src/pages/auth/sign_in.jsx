@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
-import { AiFillEyeInvisible } from "react-icons/ai";
+import { AiFillEyeInvisible, AiOutlineLoading3Quarters } from "react-icons/ai";
 import { BsEyeFill } from "react-icons/bs";
-import { useNavigate,useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { sucessNotify, errorNotify } from "../../../helper/ToastLogin";
 import ReCAPTCHA from "react-google-recaptcha";
 import axios_instance from "../../utils/axios";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 export default function SignIn() {
   const [captchaValue, setCaptchaValue] = useState(null);
@@ -16,27 +15,22 @@ export default function SignIn() {
 
   const siteKey = "6Lf4inwqAAAAAD64ITgkHFsgBPk_qvE52l2_6ltd";
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const roleFromQuery = queryParams.get("role");
+    if (roleFromQuery) setRole(roleFromQuery);
+  }, [location]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCredentials((prev) => ({ ...prev, [name]: value }));
   };
 
-  const togglePassword = () => {
-    setViewPassword((prev) => !prev);
-  };
+  const togglePassword = () => setViewPassword((prev) => !prev);
 
-  const handleCaptchaChange = (value) => {
-    setCaptchaValue(value);
-  };
-  const location = useLocation();
-  useEffect(() => {
-    const queryParams = new URLSearchParams(location.search);
-    const roleFromQuery = queryParams.get("role");
-    if (roleFromQuery) {
-      setRole(roleFromQuery);
-    }
-  }, [location]);
+  const handleCaptchaChange = (value) => setCaptchaValue(value);
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -46,12 +40,12 @@ export default function SignIn() {
       return;
     }
 
-    setLoading(true); // Start loader
+    setLoading(true);
 
     axios_instance
-      .post("api/users/login/", {...credentials,role})
-      .then((response) => {
-        const { access, user: loggedInUser } = response.data;
+      .post("api/users/login/", { ...credentials, role })
+      .then(({ data }) => {
+        const { access, user: loggedInUser } = data;
         localStorage.setItem("USER_TOKEN", access);
         localStorage.setItem("USER_ROLE", loggedInUser.role);
         localStorage.setItem("USER_PROFILE", JSON.stringify(loggedInUser));
@@ -72,33 +66,37 @@ export default function SignIn() {
         }
       })
       .catch((error) => {
-        errorNotify(error.response.data.non_field_errors[0] || error.response?.error || "Unknown error" );
-        // Handle error response here
+        const fallbackMessage = "Erro desconhecido";
+        const errorMessage =
+          error?.response?.data?.non_field_errors?.[0] ||
+          error?.response?.data?.detail ||
+          fallbackMessage;
+        errorNotify(errorMessage);
       })
-      .finally(() => {
-        setLoading(false); // Stop loader in all cases
-      });
+      .finally(() => setLoading(false));
   };
 
   return (
-    <div className="flex overflow-hidden bg-white h-screen w-full">
-      <div className=" h-full w-[25.5%] lg:block hidden relative">
+    <div className="flex flex-col lg:flex-row min-h-screen w-full">
+      <div className="hidden lg:block fixed h-screen w-[25.5%]">
         <img
           src="/teacher/avagwhite.png"
           className="absolute w-28 left-7 bottom-0"
         />
-        <img src="/teacher/signin.png" className="h-screen flex" />
+        <img src="/teacher/signin.png" className="h-full w-full object-cover" />
       </div>
-      <div className="flex w-full lg:w-[74.5%] 2xl:gap-[30px] lg:gap-[25px] flex-col justify-center items-center h-full">
+
+      <div className="lg:ml-[25.5%] flex-1 p-4 md:px-12 xl:px-24 2xl:px-32 flex flex-col items-center justify-start pt-10 lg:pt-0 overflow-auto">
         <div className="flex mb-5 lg:mb-0 w-full items-center justify-center">
           <h1 className="text-main-dark text-3xl font-semibold 2xl:text-5xl">
             Bem-vindo de volta
           </h1>
           <img src="/teacher/hand.png" className="lg:size-24 size-20" />
         </div>
+
         <form
           onSubmit={handleLogin}
-          className="2xl:p-[30px] w-[85%] lg:w-[50%] p-4 lg:p-5 flex flex-col gap-[18px] rounded-xl 2xl:rounded-3xl bg-main-light"
+          className="w-[80%] max-w-2xl bg-main-light rounded-xl 2xl:rounded-3xl p-4 md:p-6 flex flex-col gap-4"
         >
           <label htmlFor="email" className="font-medium text-lg text-main-dark">
             Email
@@ -109,7 +107,7 @@ export default function SignIn() {
               name="email"
               value={credentials.email}
               onChange={handleChange}
-              className="text-main-dark/70 lg:mt-[10px] mt-[7px] 2xl:px-[18px] lg:px-[10px] px-[7px] 2xl:placeholder:text-base lg:placeholder:text-sm text-sm 2xl:text-base placeholder:text-main-dark/70 border-none active:border-none outline-none bg-input rounded-lg 2xl:rounded-xl w-full py-3 2xl:py-4"
+              className="text-main-dark/70 mt-[7px] 2xl:px-[18px] lg:px-[10px] px-[7px] placeholder:text-main-dark/70 outline-none bg-input rounded-lg w-full py-3"
               id="email"
               required
             />
@@ -127,32 +125,41 @@ export default function SignIn() {
               type={viewPassword ? "text" : "password"}
               autoComplete="off"
               placeholder="Senha"
-              className="text-main-dark/70 lg:mt-[10px] mt-[7px] 2xl:px-[18px] lg:px-[10px] px-[7px] 2xl:placeholder:text-base lg:placeholder:text-sm text-sm 2xl:text-base placeholder:text-main-dark/70 border-none active:border-none outline-none bg-input rounded-lg 2xl:rounded-xl w-full py-3 2xl:py-4"
+              className="text-main-dark/70 mt-[7px] 2xl:px-[18px] lg:px-[10px] px-[7px] placeholder:text-main-dark/70 outline-none bg-input rounded-lg w-full py-3"
               id="password"
               required
             />
-            <p className="top-[60%] right-3 absolute" onClick={togglePassword}>
-              {!viewPassword ? (
-                <BsEyeFill size={20} />
-              ) : (
+            <p
+              className="top-[60%] right-3 absolute cursor-pointer"
+              onClick={togglePassword}
+              aria-label="Toggle password visibility"
+            >
+              {viewPassword ? (
                 <AiFillEyeInvisible size={20} />
+              ) : (
+                <BsEyeFill size={20} />
               )}
             </p>
           </label>
-          {/* Forgot Password? */}
-          <p onClick={() => navigate("/auth/forgot-password")} className="text-main-dark/70 text-sm lg:text-base 2xl:text-lg cursor-pointer">
+
+          <p
+            onClick={() => navigate("/auth/forgot-password")}
+            className="text-main-dark/70 text-sm cursor-pointer"
+          >
             Forgot Password?
           </p>
+
           <ReCAPTCHA
-            hl={"pt-BR"}
+            hl="pt-BR"
             sitekey={siteKey}
             onChange={handleCaptchaChange}
+            theme="light"
           />
 
           <button
             type="submit"
             disabled={loading}
-            className="bg-main-dark w-[100%] cursor-pointer rounded-xl text-center text-white font-bold text-xl mt-2 2xl:text-2xl py-3 flex justify-center items-center gap-2 disabled:opacity-70"
+            className="bg-main-dark w-full cursor-pointer rounded-xl text-white font-bold text-xl mt-2 py-3 flex justify-center items-center gap-2 disabled:opacity-70"
           >
             {loading ? (
               <>
@@ -163,8 +170,9 @@ export default function SignIn() {
               "Entrar"
             )}
           </button>
+
           <div className="flex flex-col gap-2 items-center">
-            <p className="text-main-dark/70 text-sm lg:text-base 2xl:text-lg">
+            <p className="text-main-dark/70 text-sm">
               Not registered yet?
               <span
                 onClick={() => navigate(`/auth/sign_up?role=${role}`)}

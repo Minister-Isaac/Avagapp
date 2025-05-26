@@ -3,7 +3,7 @@ import axios_instance from "../utils/axios";
 import { Dialog } from "@material-tailwind/react";
 import Confetti from 'react-confetti';
 
-const QuizGameTwo = () => {
+const QuizGameTwo = (student_id) => {
   const [questionsData, setQuestionsData] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswerKey, setSelectedAnswerKey] = useState(null);
@@ -40,25 +40,38 @@ const QuizGameTwo = () => {
     setSelectedAnswerKey(key);
   };
 
-  const handleSubmit = () => {
-    if (!currentQuestion || selectedAnswerKey === null) return;
+ const handleSubmit = () => {
+  if (!currentQuestion || selectedAnswerKey === null) return;
 
-    const selectedIndex = parseInt(selectedAnswerKey.split('-')[1], 10);
-    const selectedOption = currentQuestion.options[selectedIndex];
+  const selectedIndex = parseInt(selectedAnswerKey.split('-')[1], 10);
+  const selectedOption = currentQuestion.options[selectedIndex];
+  const selectedOptionId = selectedOption?.id;
 
-    if (selectedOption?.is_correct) {
-      setScore(score + (currentQuestion.points || 1));
-    }
+  // Submit the answer
+  axios_instance.post("learning/student-answers/", {
+    student: student_id.student_id,
+    question: currentQuestion.id,
+    selected_option: selectedOptionId,
+    typed_answer: null, // Optional, used for typed questions
+  }).catch(error => {
+    console.error("Error submitting answer:", error);
+  });
 
-    setProgress(((currentQuestionIndex + 1) / questionsData.length) * 100);
+  // Evaluate and continue
+  if (selectedOption?.is_correct) {
+    setScore(score + (currentQuestion.points || 1));
+  }
 
-    if (currentQuestionIndex + 1 < questionsData.length) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-      setSelectedAnswerKey(null);
-    } else {
-      setShowModal(true);
-    }
-  };
+  setProgress(((currentQuestionIndex + 1) / questionsData.length) * 100);
+
+  if (currentQuestionIndex + 1 < questionsData.length) {
+    setCurrentQuestionIndex(currentQuestionIndex + 1);
+    setSelectedAnswerKey(null);
+  } else {
+    setShowModal(true);
+  }
+};
+
 
   const handleReset = () => {
     setScore(0);

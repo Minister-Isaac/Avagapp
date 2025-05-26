@@ -33,6 +33,7 @@ export default function THome() {
  const [modalType, setModalType] = useState("post");
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedUserId, setSelectedUserId] = useState(null);
+  const [stats, setStats] = useState([]);
 
   const deleteData = async (id) => {
     const dataf = Data.filter((row) => row.id !== id);
@@ -53,10 +54,18 @@ export default function THome() {
       } catch (error) {
         console.error("Error fetching data:", error);
       }
+       try {
+        const statsResponse = await axios_instance.get("learning/statistics/teacher-stats/");
+        setStats(statsResponse.data);
+      } catch (error) {
+        console.error("Error fetching stats:", error);
+      }
     };
 
     fetchData();
+    
   }, []);
+
 
   const toggleModal = () => {
     setOpen(!open);
@@ -88,6 +97,15 @@ export default function THome() {
     setOpen(true);
   };
 
+  const data = Object.entries(stats).map(([key, value]) => {
+  return {
+    label: key,
+    count: value.count,
+    desp: value.new_certificates ?? value.difference ?? 0,
+    difference: value.difference ?? value.new_certificates ?? 0,
+    // img: "/path-to-icon.svg" if needed
+  };
+});
   return (
     <div className="pr-4 flex px-2 flex-col gap-4">
       <div className="flex items-center">
@@ -99,34 +117,37 @@ export default function THome() {
       <div className="w-full">
         <img src="/teacher/banner.png" className="w-full" />
       </div>
-      <div className="grid gap-3  grid-cols-2 lg:grid-cols-3">
-        {data.map((card, id) => (
-          <div
-            key={id}
-            className="flex p-5 gap-4 bg-main-light justify-start items-center rounded-lg"
-          >
-            <div className=" bg-[#A9E8FF] p-2 rounded-full ">
-              <img src={card.img} alt={card.label} />
-            </div>
-            <div>
-              <p className="font-semibold text-xl">{card.label}</p>
-              <div className="flex gap-2 items-center">
-                <p>{card.value} </p>
-                <span
-                  className={`flex text-xs items-end ${
-                    card.label === "Aulas" ? "text-[#FF0000]" : "text-main-dark"
-                  }`}
-                >
-                  <IoTriangle
-                    size={10}
-                    className=" rotate-180 mb-[3px] mr-[2px]"
-                  />
-                  {card.desp}
-                </span>
-              </div>
-            </div>
-          </div>
-        ))}
+      <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
+     {data.map((card, id) => (
+  <div
+    key={id}
+    className="flex p-5 gap-3 bg-main-light justify-start items-center rounded-lg"
+  >
+    <div className="bg-[#A9E8FF] p-2 rounded-full">
+         <img src='/teacher/thumb.png' alt={card.label} className="w-8 h-8" />
+    </div>
+    <div>
+      <p className="font-semibold text-xl capitalize">{card.label}</p>
+      <div className="flex gap-2 items-center">
+        <p>{card.count}</p>
+        <span
+          className={`flex text-xs items-end ${
+            card.difference < 0 ? "text-[#FF0000]" : "text-main-dark"
+          }`}
+        >
+          <IoTriangle
+            size={10}
+            className={`${
+              card.difference < 0 ? "rotate-180" : ""
+            } mb-[3px] mr-[2px]`}
+          />
+          {card.desp}
+        </span>
+      </div>
+    </div>
+  </div>
+))}
+
       </div>
       <p className="font-bold -mb-5 lg:text-[25px] text-black">Students List</p>
       <UserModal

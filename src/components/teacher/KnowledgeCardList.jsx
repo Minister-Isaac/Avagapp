@@ -8,6 +8,8 @@ import { useLocation } from "react-router-dom";
 import { FaFilePdf } from "react-icons/fa6";
 import { FaVideo } from "react-icons/fa";
 import React, { useState } from "react";
+import axios_instance from "../../utils/axios";
+import { getUserProfile } from "../../utils/auth";
 
 const EmptyState = ({ message }) => (
   <div className="col-span-full flex flex-col items-center justify-center py-10 text-center">
@@ -32,8 +34,8 @@ const KnowledgeCardList = ({
     "/student/dashboard/knowledge"
   );
 
-  const isStudentdashboardRoute = location.pathname ===  "/student/dashboard"
-   
+  const isStudentdashboardRoute = location.pathname === "/student/dashboard";
+
   const toogle = (id) => {
     if (identifier === id) {
       setIdentifier(null);
@@ -41,23 +43,27 @@ const KnowledgeCardList = ({
       setIdentifier(id);
     }
   };
-  
- const onWatch = async (id) => {
-  try {
-    await axios_instance.put(`learning/knowledge-trail/${id}/`, {
-      is_watched: true,
-    });
+  const profile = getUserProfile();
+  const role = profile?.role?.toLowerCase();
 
-    // Optionally, show feedback or refresh UI here
-    console.log(`Item ${id} marked as watched.`);
-  } catch (error) {
-    console.error("Failed to mark item as watched:", error);
-  }
-};
+  const isStudent = role === "student";
+
+  const onWatch = async (id) => {
+    if (isStudent) {
+      try {
+        await axios_instance.put(`learning/knowledge-trail/${id}/`, {
+          is_watched: true,
+        });
+
+      } catch (error) {
+        console.error("Failed to mark item as watched:", error);
+      }
+    }
+  };
 
   return (
     <>
-      <div >
+      <div>
         <p className="font-bold text-[18px] lg:text-[22px] text-black">
           {title}
         </p>
@@ -72,9 +78,13 @@ const KnowledgeCardList = ({
                 className="p-3 relative mb-4 flex flex-col gap-1 rounded-xl"
               >
                 <Link
-                   onClick={onWatch(item.id)}
-                  to={isStudentdashboardRoute ? "/student/dashboard/knowledge" :`knowledge-details/${item.id}`}
-                  className="w-full rounded-xl h-[150px] bg-center bg-cover bg-no-repeat relative group"
+                  onClick={() => onWatch(item.id)}
+                  to={
+                    isStudentdashboardRoute
+                      ? "/student/dashboard/knowledge"
+                      : `knowledge-details/${item.id}`
+                  }
+                  className="w-full rounded-xl h-[150px] bg-center bg-cover bg-no-repeat relative group "
                   style={{ backgroundImage: `url('${item.thumbnail}')` }}
                 >
                   <div className="rounded-full size-10 bg-main-light p-2 absolute -right-2 -top-2 z-10 flex items-center justify-center">

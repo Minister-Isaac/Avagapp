@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios_instance from "../utils/axios";
 
 
-function FillGame() {
+function FillGame(student_id) {
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userAnswer, setUserAnswer] = useState("");
@@ -39,35 +39,49 @@ function FillGame() {
     }
   };
 
-  const handleSubmit = () => {
-    if (!questions.length) return;
+  const handleSubmit = async () => {
+  if (!questions.length) return;
 
-    const currentQuestion = questions[currentQuestionIndex];
+  const currentQuestion = questions[currentQuestionIndex];
 
-    if (userAnswer.length !== currentQuestion.correct_answer.length) return;
+  if (userAnswer.length !== currentQuestion.correct_answer.length) return;
 
-    const isAnswerCorrect = userAnswer.trim() === currentQuestion.correct_answer.toLowerCase();
+  const isAnswerCorrect = userAnswer.trim() === currentQuestion.correct_answer.toLowerCase();
 
-    setResults(prev => [
-      ...prev,
-      {
-        question: currentQuestion.question_text,
-        userAnswer,
-        correctAnswer: currentQuestion.correct_answer,
-        isCorrect: isAnswerCorrect,
-      },
-    ]);
+  // Submit the answer to the backend
+  try {
+    await axios_instance.post("learning/submit-answer/", {
+      student: student_id.student_id,
+      question: currentQuestion.id,
+      selected_option: null, // No options for fill-in-the-blank
+      typed_answer: userAnswer.trim(),
+    });
+  } catch (error) {
+    console.error("Error submitting answer:", error);
+  }
 
-    setUserAnswer("");
+  // Save result in state
+  setResults(prev => [
+    ...prev,
+    {
+      question: currentQuestion.question_text,
+      userAnswer,
+      correctAnswer: currentQuestion.correct_answer,
+      isCorrect: isAnswerCorrect,
+    },
+  ]);
 
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-      setProgress(((currentQuestionIndex + 1) / questions.length) * 100);
-    } else {
-      setProgress(100);
-      setShowModal(true);
-    }
-  };
+  setUserAnswer("");
+
+  if (currentQuestionIndex < questions.length - 1) {
+    setCurrentQuestionIndex(currentQuestionIndex + 1);
+    setProgress(((currentQuestionIndex + 1) / questions.length) * 100);
+  } else {
+    setProgress(100);
+    setShowModal(true);
+  }
+};
+
 
   if (!questions.length) return <p>Loading questions...</p>;
 

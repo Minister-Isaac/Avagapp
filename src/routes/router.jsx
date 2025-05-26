@@ -6,30 +6,29 @@ import HomePage from "../HomePage";
 import Forgotpassword from "../pages/auth/ForgotPassword";
 import Generate from "../pages/teacher/Generate";
 import Knowledge from "../pages/teacher/Knowledge";
-import TeachLayout from "../pages/teacher/TeachLayout";
+import MainLayout from "../pages/mainLayout";
+
+
 import THome from "../pages/teacher/THome";
 import Setting from "../pages/Setting";
-import Student from "../pages/teacher/Student";
+import Student from "../pages/Student";
 import Otp from "../pages/auth/Otp";
 import ResetPassword from "../pages/auth/ResetPassword";
 import Ranking from "../pages/teacher/Ranking";
+import StudentRanking from "../pages/student/Ranking";
 import Game from "../pages/teacher/Game";
-import GameDetails from "../pages/teacher/GameDetails";
+import GameDetails from "../pages/GameDetails";
 import GameCreate from "../pages/teacher/GameCreate";
-import AdminLayout from "../pages/admin/AdminLayout";
-import AdminHome from "../pages/teacher/AdminHome";
+import AdminHome from "../pages/admin/AdminHome";
 import TeacherManagement from "../pages/admin/TeacherManagement";
-import TeacherRegistration from "../pages/admin/TeacherRegistration";
-import AdminKnowledge from "../pages/admin/AdminKnowledge";
+// import AdminKnowledge from "../pages/admin/AdminKnowledge";
 import AdminRanking from "../pages/admin/AdminRanking";
-import StudentLayout from "../pages/student/StudentLayout";
 import SHome from "../pages/student/SHome";
 import ClassOverViewDetails from "../pages/ClassOverViewDetails";
 import StudentKnowledge from "../pages/student/StudentKnowledge";
 import Activity from "../pages/student/Activity";
 import StudentProfile from "../pages/student/StudentProfile";
-import StudentGame from "../pages/student/StudentGame";
-import StudentGameDetails from "../pages/student/StudentGameDetails";
+// import StudentGame from "../pages/student/StudentGame";
 import ClassDetails from "../pages/student/ClassDetails";
 import SignIn from "../pages/auth/sign_in";
 import Signup from "../pages/auth/sign_up";
@@ -46,7 +45,6 @@ export default function RouterComponent() {
         <Route path="/auth/forgot-password" element={<PublicRoute><Forgotpassword /></PublicRoute>} />
         <Route path="/auth/reset-password" element={<PublicRoute><ResetPassword /></PublicRoute>} />
         <Route path="/auth/verify-otp" element={<PublicRoute><Otp /></PublicRoute>} />
-
         {/* Home */}
         <Route path="/" element={<PublicRoute><HomePage /></PublicRoute>} />
 
@@ -58,7 +56,7 @@ export default function RouterComponent() {
               allowedRoles={["student"]}
               redirectTo="/auth/sign_in?role=student"
             >
-              <StudentLayout />
+              <MainLayout />
             </RoleRoute>
           }
         >
@@ -69,8 +67,10 @@ export default function RouterComponent() {
           <Route path="activty" element={<Activity />} />
           <Route path="student-profile" element={<StudentProfile />} />
           <Route path="student-game" element={<Game />} />
-          <Route path="student-game/:gameType" element={<StudentGameDetails />} />
+          <Route path="student-game/:gameType" element={<GameDetails />} />
           <Route path="setting" element={<Setting />} />
+          <Route path="ranking" element={<StudentRanking />} />
+
         </Route>
 
         {/* Admin routes */}
@@ -81,18 +81,18 @@ export default function RouterComponent() {
               allowedRoles={["admin"]}
               redirectTo="/auth/sign_in?role=admin"
             >
-              <AdminLayout />
+              <MainLayout />
             </RoleRoute>
           }
         >
           <Route index element={<AdminHome />} />
-          <Route path="register-teacher" element={<TeacherRegistration />} />
-          <Route path="teacher-management" element={<TeacherManagement />} />
+          <Route path="register-teacher" element={<TeacherManagement />} />
+          <Route path="students" element={<Student />} />
           <Route path="knowledge" element={<Knowledge />} />
           <Route path="knowledge/knowledge-details/:id" element={<ClassOverViewDetails />} />
           <Route path="ranking" element={<AdminRanking />} />
           <Route path="game" element={<Game />} />
-          <Route path="game/:gameType" element={<StudentGameDetails />} />
+          <Route path="game/:gameType" element={<GameDetails />} />
           <Route path="setting" element={<Setting />} />
         </Route>
 
@@ -104,17 +104,17 @@ export default function RouterComponent() {
               allowedRoles={["teacher"]}
               redirectTo="/auth/sign_in?role=teacher"
             >
-              <TeachLayout />
+              <MainLayout />
             </RoleRoute>
           }
         >
           <Route index element={<THome />} />
-          <Route path="management" element={<Student />} />
+          <Route path="students" element={<Student />} />
           <Route path="generate" element={<Generate />} />
           <Route path="knowledge" element={<Knowledge />} />
           <Route path="ranking" element={<Ranking />} />
           <Route path="game" element={<Game />} />
-          <Route path="game/:gameType" element={<StudentGameDetails />} />
+          <Route path="game/:gameType" element={<GameDetails />} />
           <Route path="setting" element={<Setting />} />
           <Route path="knowledge/knowledge-details/:id" element={<ClassOverViewDetails />} />
         </Route>

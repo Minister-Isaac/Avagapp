@@ -41,13 +41,13 @@ export const TABLE_HEAD4 = [
   "Medalha",
   "Pontuação",
   "Desempenho",
+  "Last Activity",
   "Certificado",
 ];
 export const TABLE_HEAD5 = [
   "Nº",
   "Nome",
   "Pontuação",
-  "Nivel",
   "Presença",
   "Atividade",
   "Ação",

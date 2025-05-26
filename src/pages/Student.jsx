@@ -1,3 +1,5 @@
+import React, { useState, useEffect } from "react";
+import axios_instance from "../utils/axios";
 import {
   Avatar,
   Button,
@@ -9,57 +11,121 @@ import {
   ListItemPrefix,
   Typography,
 } from "@material-tailwind/react";
-import React, { useState } from "react";
 import { BsFillTrashFill, BsThreeDotsVertical } from "react-icons/bs";
 import { GoPencil } from "react-icons/go";
+import UserModal from "../components/teacher/usermodal";
+import ViewProfileModal from "../components/teacher/ViewStudentProfileModal";
 import { IoEyeOutline } from "react-icons/io5";
 
-import { TABLE_HEAD_ADMIN, TABLE_ROWS } from "../../../helper/data";
-function TeacherRegistration() {
-  const [Data, setData] = useState(TABLE_ROWS);
+import { TABLE_HEAD2 } from "../../helper/data";
+
+function Students() {
+  const [Data, setData] = useState([]);
   const ITEMS_PER_PAGE = 9;
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(Data.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const currentData = Data.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
-  const deleteData = (id) => {
-    const dataf = Data.filter((row, index) => index !== id);
-    setData(dataf);
-  };
   const [open, setOpen] = useState(false);
+  const [modalType, setModalType] = useState("post");
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  // const [selectedUser, setSelectedUser] = useState(null);
 
-  const handleOpen = () => {
-    setOpen(!open);
-  };
+  useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        const response = await axios_instance.get("api/users/get-all-students"); // Replace with your API URL
+        setData(response.data.results);
+      } catch (error) {
+        console.error("Error fetching students:", error);
+      }
+    };
 
-  const [identifier, setIdentifier] = useState(null);
+    fetchStudents();
+  }, []);
 
-  const toogleEdit = (id) => {
-    if (identifier === id) {
-      setIdentifier(null);
-    } else {
-      setIdentifier(id);
+  const deleteData = async (id) => {
+    const dataf = Data.filter((row) => row.id !== id);
+    setData(dataf);
+    try {
+      const response = await axios_instance.delete(`api/users/${id}/`);
+      console.log(response.data); // Handle the fetched data as needed
+    } catch (error) {
+      console.error("Error deleting user:", error);
     }
   };
 
+  const toggleModal = () => {
+    setOpen(!open);
+    if (open) {
+      setModalType("post");
+      setSelectedUser(null);
+      setSelectedUserId(null);
+    }
+  };
+
+  const toogleEdit = (id) => {
+    if (selectedUserId === id) {
+      setSelectedUserId(null);
+    } else {
+      setSelectedUserId(id);
+    }
+  };
+
+  const handleEditUser = (index) => {
+    const user = Data[index];
+    console.log(user);
+    setModalType("put");
+    setSelectedUserId(index);
+    setSelectedUser({
+      first_name: user.first_name?.split(" ")[0] || "",
+      last_name: user.last_name?.split(" ")[0] || "",
+      email: user.email || "",
+      password: "",
+      confirm_password: "",
+    });
+    setOpen(true);
+  };
+  const handleOpen = (userdata) => {
+    setSelectedUser(userdata);
+    setIsModalOpen(true);
+  };
+  const handleClose = () => setIsModalOpen(false);
+
   return (
-    <div className="flex pt-5 px-2 flex-col gap-4">
-      <div className="flex justify-between p-2 items-center text-white">
-        <p className="font-bold text-[28px] text-black">
-          Gestão de Professores
+    <div className="flex pt-5 px-3 flex-col gap-4">
+      <div className="flex justify-between p-2 gap-3 items-center text-white">
+        <p className="font-bold lg:text-[28px] text-black">
+          Gestão de Usuários
         </p>
-        {/* <p onClick={handleOpen} className='flex cursor-pointer p-[10px] items-center rounded-2xl gap-2 bg-main-dark'>Adicionar Novo Usuário</p> */}
+        <p
+          onClick={toggleModal}
+          className="flex cursor-pointer p-[6px] lg:p-[10px] text-center items-center rounded-lg lg:rounded-2xl gap-2 bg-main-dark"
+        >
+          Adicionar Novo Usuário
+        </p>
       </div>
 
-      <Card className="h-full lg:overflow-hidden overflow-x-scroll   w-full  px-6">
+      <UserModal
+        open={open}
+        handleOpen={toggleModal}
+        requestType={modalType}
+        userId={selectedUserId}
+        apiEndpoint="users/sign-up/"
+        data={selectedUser}
+      />
+
+      <Card className="h-full lg:overflow-hidden overflow-x-scroll w-full px-6">
         <table className="w-full min-w-max table-auto text-left">
           <thead>
             <tr>
-              {TABLE_HEAD_ADMIN.map((head) => (
+              {TABLE_HEAD2.map((head) => (
                 <th
                   key={head}
-                  className="border-b  p-2 border-gray-300 pb-4 pt-10"
+                  className="border-b p-2 border-gray-300 pb-4 pt-10"
                 >
                   <Typography
                     variant="small"
@@ -74,14 +140,28 @@ function TeacherRegistration() {
           </thead>
           <tbody>
             {currentData.map(
-              ({ value, disc, name, date, img, email, status }, index) => {
-                const isLast = index === currentData.length - 1;
+              (
+                {
+                  first_name,
+                  avatar,
+                  Turma,
+                  last_name,
+                  created_at,
+                  img,
+                  email,
+                  status,
+                  id,
+                },
+                index
+              ) => {
+                const isLast = id === currentData.length - 1;
                 const classes = isLast
-                  ? "py-4  p-3 "
-                  : "py-4 p-3 border-b  border-gray-300 ";
-
+                  ? "py-4 p-3"
+                  : "py-4 p-3 border-b border-gray-300";
+                const name = first_name + " " + last_name;
+                const date = new Date(created_at).toISOString().slice(0, 10);
                 return (
-                  <tr key={index} className="hover:bg-gray-50">
+                  <tr key={id} className="hover:bg-gray-50">
                     <td className={classes}>
                       <Typography
                         variant="small"
@@ -133,44 +213,52 @@ function TeacherRegistration() {
                         variant="small"
                         className="font-normal text-gray-600"
                       >
-                        {disc}
+                        {Turma}
                       </Typography>
                     </td>
                     <td style={{ position: "relative" }} className={classes}>
-                      <IconButton
-                        onClick={() => toogleEdit(index)}
-                        variant="text"
-                      >
-                        <BsThreeDotsVertical className=" rotate-90 h-4 w-4" />
+                      <IconButton onClick={() => toogleEdit(id)} variant="text">
+                        <BsThreeDotsVertical className="rotate-90 h-4 w-4" />
                       </IconButton>
                       <Card
-                        onClick={() => toogleEdit(index)}
-                        className={` ${
-                          identifier === index ? "block" : "hidden"
+                        onClick={() => toogleEdit(id)}
+                        className={`${
+                          selectedUserId === id ? "block" : "hidden"
                         } ${
                           isLast ? "-top-20" : "top-0"
                         } right-16 absolute w-[135px]`}
                       >
-                        <List className="w-[120px] text-xs ">
-                          {" "}
-                          <ListItem className="text-xs w-[120px]  ">
+                        <List className="w-[120px] text-xs">
+                          <ListItem
+                            onClick={() =>
+                              handleOpen({
+                                avatar,
+                                name,
+                                email,
+                                dataDeRegistro: date
+
+                              })
+                            }
+                            className="w-[120px] text-xs"
+                          >
                             <ListItemPrefix>
                               <IoEyeOutline />
                             </ListItemPrefix>
-                            Ver
+                            var
                           </ListItem>
-                          <ListItem className=" w-[120px]   text-xs">
-                            {" "}
+                          <ListItem
+                            onClick={() => handleEditUser(index)}
+                            className="w-[120px] text-xs"
+                          >
                             <ListItemPrefix>
                               <GoPencil />
                             </ListItemPrefix>
                             Editar
                           </ListItem>
                           <ListItem
-                            onClick={() => deleteData(index)}
-                            className=" text-xs w-[120px] font-semibold "
+                            onClick={() => deleteData(id)}
+                            className="text-xs w-[120px] font-semibold"
                           >
-                            {" "}
                             <ListItemPrefix>
                               <BsFillTrashFill />
                             </ListItemPrefix>
@@ -211,8 +299,13 @@ function TeacherRegistration() {
           </Button>
         </div>
       </CardFooter>
+      <ViewProfileModal
+        open={isModalOpen}
+        onClose={handleClose}
+        user={selectedUser}
+      />
     </div>
   );
 }
 
-export default TeacherRegistration;
+export default Students;

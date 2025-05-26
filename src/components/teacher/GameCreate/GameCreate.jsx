@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import QuizForm from './QuizForm';
+import QuizForm from './quizForm';
 import WordHuntForm from './WordHuntForm';
 import ColumnMatchForm from './ColumnMatchForm';
 

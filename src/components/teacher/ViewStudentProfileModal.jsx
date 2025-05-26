@@ -1,4 +1,3 @@
-// ViewProfileModal.jsx
 import {
   Dialog,
   DialogHeader,
@@ -8,12 +7,26 @@ import {
   Card,
   Typography,
   Chip,
-  Progress,
   IconButton,
 } from "@material-tailwind/react";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import { AiOutlineClose } from "react-icons/ai";
+import Avatar from "@mui/material/Avatar";
 
-export default function ViewProfileModal({ open, onClose }) {
+export default function ViewProfileModal({ open, onClose, user = {} }) {
+  const safeUser = user || {};
+
+  if (safeUser.avatar) {
+    return <Avatar src={safeUser.avatar} alt={safeUser.full_name} size="md" variant="circular" />;
+  }
+// fallback: show initials or "?" when no image
+  const initials = safeUser.full_name
+    ? safeUser.full_name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+    : "?";
+
   return (
     <Dialog
       size="lg"
@@ -24,52 +37,39 @@ export default function ViewProfileModal({ open, onClose }) {
       <Card className="p-4 md:p-6 rounded-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-4">
           <DialogHeader className="text-[#1c96c5]">
+            {safeUser.avatar && (
+              <Avatar sx={{ width: 34, height: 34 }} variant="circular">
+            {initials}
+          </Avatar>
+            )}
             View Profile
           </DialogHeader>
           <IconButton variant="text" onClick={onClose}>
-            <XMarkIcon className="h-5 w-5 text-gray-600" />
+            <AiOutlineClose className="h-5 w-5 text-gray-600" />
           </IconButton>
         </div>
 
         <DialogBody className="space-y-6">
+          {/* Avatar displayed separately */}
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <ProfileRow label="Name" value="Egbumokei Isaac" />
-            <ProfileRow label="Email" value="isaac@example.com" />
-            <ProfileRow label="Reg. Date" value="May 12, 2023" />
-            <ProfileRow label="Status" value="Active" chip />
-            <ProfileRow label="Class" value="Senior A" />
-            <ProfileRow label="Score" value="89 / 100" />
-            <ProfileRow label="Level" value="Intermediate" />
-            <div className="md:col-span-2">
-              <Typography variant="small" className="text-blue-gray-500 mb-2">
-                Performance
-              </Typography>
-              <Progress
-                value={89}
-                color="blue"
-                className="h-3"
-                style={{ backgroundColor: "#d1ecf6" }}
-                barProps={{ style: { backgroundColor: "#1c96c5" } }}
-              />
-            </div>
-            <div className="md:col-span-2">
-              <Typography variant="small" className="text-blue-gray-500 mb-2">
-                Certificate
-              </Typography>
-              <Button color="blue" size="sm" className="bg-[#1c96c5]">
-                Download Certificate
-              </Button>
-            </div>
+            {Object.entries(safeUser)
+              .filter(([key]) => key !== "avatar") // exclude avatar here
+              .map(([key, value]) => (
+                <ProfileRow
+                  key={key}
+                  label={key
+                    .replace(/_/g, " ")
+                    .replace(/([A-Z])/g, " $1")
+                    .replace(/^./, (str) => str.toUpperCase())}
+                  value={value || "N/A"}
+                />
+              ))}
           </div>
         </DialogBody>
 
         <DialogFooter>
-          <Button
-            variant="text"
-            color="gray"
-            onClick={onClose}
-            className="mr-2"
-          >
+          <Button variant="text" color="gray" onClick={onClose}>
             Close
           </Button>
         </DialogFooter>

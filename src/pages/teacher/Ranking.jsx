@@ -1,79 +1,144 @@
-import { Avatar, Button, Card, CardFooter, IconButton, List, ListItem, ListItemPrefix, Typography } from "@material-tailwind/react";
-import { useState } from 'react';
-import { BsFillTrashFill, BsThreeDotsVertical } from 'react-icons/bs';
-
-import { FiSearch } from "react-icons/fi";
-import { GoPencil } from "react-icons/go";
-import { IoMdFunnel } from "react-icons/io";
-import { IoEyeOutline } from "react-icons/io5";
-import { LuArrowDownUp } from "react-icons/lu";
-import { TABLE_HEAD5, TABLE_ROWS } from "../../../helper/data";
+import {
+  Avatar,
+  Button,
+  Card,
+  CardFooter,
+  Checkbox,
+  IconButton,
+  Typography,
+} from "@material-tailwind/react";
+import React, { useState, useEffect } from "react";
+import axios_instance from "../../utils/axios";
+import { RiAiGenerate } from "react-icons/ri";
+import { TABLE_HEAD4 } from "../../../helper/data";
+import CertificateDialog from "../../components/CertificateDialog";
 
 function Ranking() {
+  const [students, setStudents] = useState([]);
+  const [isBulkSelectMode, setIsBulkSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [certificate, setCertificate] = useState(1);
+  const [open, setOpen] = useState(false);
 
-  const [Data, setData] = useState(TABLE_ROWS)
-    const ITEMS_PER_PAGE = 9;
-    const [currentPage, setCurrentPage] = useState(1);
-    const totalPages = Math.ceil(Data.length / ITEMS_PER_PAGE);
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const currentData = Data.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  
-    
-    const deleteData = (id) => {
-        const dataf = Data.filter((row, index) => index !== id)
-        setData(dataf)
+  const ITEMS_PER_PAGE = 9;
+  const totalPages = Math.ceil((students?.length || 0) / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const currentData = students.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+  const handleClose = () => setOpen(false);
+
+  const handleExport = () => {
+    const urls = certificate?.certificate_url;
+
+    if (Array.isArray(urls)) {
+      urls.forEach((url, index) => {
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `certificate-${index + 1}.pdf`;
+        document.body.appendChild(link); // Needed for some browsers
+        link.click();
+        document.body.removeChild(link);
+      });
+    } else if (typeof urls === "string") {
+      const link = document.createElement("a");
+      link.href = urls;
+      link.download = "certificate.pdf";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
 
-  const [identifier, setIdentifier] = useState(null)
+    handleClose();
+  };
 
+  useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        const response = await axios_instance.get(
+          "learning/leaderboard/leaderboard/"
+        );
+        const results = Array.isArray(response.data?.results)
+          ? response.data.results
+          : [];
+        setStudents(results);
+      } catch (error) {
+        console.error("Error fetching students:", error);
+        setStudents([]);
+      }
+    };
 
+    fetchStudents();
+  }, []);
 
-  const toogleEdit = (id) => {
-    if (identifier === id) {
-      setIdentifier(null)
+  const handleGenerate = async (id = null) => {
+    const idsToGenerate = id ? [id] : selectedIds;
+
+    if (idsToGenerate.length === 0) {
+      alert("Selecione pelo menos um estudante para gerar certificados.");
+      return;
+    }
+
+    setOpen(true);
+
+    try {
+      const responses = await axios_instance.post(
+        `learning/certificates/generate-certificate/`,
+        {
+          student_ids: idsToGenerate,
+        }
+      );
+
+      const allUrls = responses.flatMap((res) => res.data.certificate_url);
+      setCertificate({ certificate_url: allUrls });
+    } catch (error) {
+      console.error("Erro ao gerar certificados:", error);
+    }
+  };
+
+  const toggleSelection = (id) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const BulkselectHandler = () => {
+    if (!isBulkSelectMode) {
+      setIsBulkSelectMode(true); // Just enable bulk mode
     } else {
-      setIdentifier(id)
-
+      handleGenerate(); // Only generate if checkboxes are selected
     }
-
-
-  }
+  };
 
   return (
-    <div className="pt-2 px-3 overflow-hidden lg:px-0">
+    <div className="flex pt-5 px-3 flex-col gap-4">
+      <div className="flex justify-between p-2 items-center text-white">
+        <p className="font-bold lg:text-[28px] w-full text-black">
+          Certificate Generation
+        </p>
 
-      <p className='font-bold text-[23px] text-black'>Ranking</p>
-
-
-      <div className='flex justify-between  px-10  items-center text-black/50'>
-
-        <div className="flex gap-3 text-lg">
-          <IoMdFunnel />
-          <LuArrowDownUp />
-        </div>
-
-        <div className="flex text-accent items-center justify-center  lg:w-[20%] gap-4">
-          <input
-            type="text"
-            autoComplete="off"
-            placeholder="Pesquisar aqui"
-            className="text-accent 2xl:px-[18px] lg:px-[10px] px-[7px] 2xl:placeholder:text-base lg:placeholder:text-sm text-sm 2xl:text-base placeholder:text-accent border-none active:border-none outline-none rounded-lg 2xl:rounded-xl w-full py-3 2xl:py-4 text-black"
-            id="name"
-          />
-          <FiSearch size={16} className="text-black/30" />
-        </div>
+        <p
+          onClick={BulkselectHandler}
+          className="flex text-sm justify-center w-full lg:w-[20%] cursor-pointer p-2 lg:p-[12px] items-center rounded-2xl gap-2 bg-main-dark"
+        >
+          <RiAiGenerate />
+          {isBulkSelectMode ? "Gerar Selecionados" : "Selecionar Múltiplos"}
+        </p>
       </div>
 
-      <Card className="h-full lg:overflow-hidden overflow-x-scroll  w-full  lg:px-6">
+      <Card className="h-full lg:overflow-hidden overflow-x-scroll w-full px-6">
         <table className="w-full min-w-max table-auto text-left">
           <thead>
             <tr>
-              {TABLE_HEAD5.map((head) => (
-                <th key={head} className="border-b  p-2 border-gray-300 pb-4 pt-10">
+              {TABLE_HEAD4.map((head) => (
+                <th
+                  key={head}
+                  className="border-b p-2 border-gray-300 pb-4 pt-10"
+                >
                   <Typography
                     variant="small"
                     color="blue-gray"
-                    className="font-semibold leading-none "
+                    className="font-semibold leading-none"
                   >
                     {head}
                   </Typography>
@@ -82,23 +147,35 @@ function Ranking() {
             </tr>
           </thead>
           <tbody>
-            {currentData.map(({ value, date, name, pun, img, medal, desemp }, index) => {
+            {currentData.map((student, index) => {
               const isLast = index === currentData.length - 1;
-              const classes = isLast ? "py-4  p-3 " : "py-4 p-3 border-b  border-gray-300 ";
+              const classes = isLast
+                ? "py-4 p-3"
+                : "py-4 p-3 border-b border-gray-300";
+              const isChecked = selectedIds.includes(student.id);
+              const rowNumber = startIndex + index + 1;
+              const name = `${student.first_name} ${student.last_name}`;
 
               return (
-                <tr key={index} className="hover:bg-gray-50">
+                <tr key={student.id} className="hover:bg-gray-50">
                   <td className={classes}>
                     <Typography
                       variant="small"
-                      className="font-normal text-gray-600"
+                      className="font-normal text-gray-600 flex items-center gap-2"
                     >
-                      {startIndex + index + 1}
+                      {isBulkSelectMode && (
+                        <Checkbox
+                          checked={isChecked}
+                          onChange={() => toggleSelection(student.id)}
+                        />
+                      )}
+                      {rowNumber}
                     </Typography>
                   </td>
+
                   <td className={classes}>
                     <div className="flex items-center gap-3">
-                      <Avatar src={img} alt={name} size="sm" />
+                      <Avatar src={student.img} alt={name} size="sm" />
                       <div className="flex flex-col">
                         <Typography
                           variant="small"
@@ -110,71 +187,98 @@ function Ranking() {
                       </div>
                     </div>
                   </td>
+
                   <td className={classes}>
                     <Typography
                       variant="small"
                       className="font-normal text-gray-600"
                     >
-                      {medal}
+                      {student.medal}
                     </Typography>
                   </td>
+
                   <td className={classes}>
                     <Typography
                       variant="small"
                       className="font-normal text-gray-600"
                     >
-                      {pun}
+                      {student.score}
                     </Typography>
                   </td>
+
                   <td className={classes}>
                     <Typography
                       variant="small"
                       className="font-normal text-gray-600"
                     >
-                      {desemp}
+                      {student.Attendance}
                     </Typography>
                   </td>
+
                   <td className={classes}>
                     <Typography
                       variant="small"
                       className="font-normal text-gray-600"
                     >
-                      {date}
+                      {student.last_activity}
                     </Typography>
                   </td>
+
                   <td style={{ position: "relative" }} className={classes}>
-
-                    <IconButton onClick={() => toogleEdit(index)} variant="text">
-                      <BsThreeDotsVertical className=" rotate-90 h-4 w-4" />
+                    <IconButton onClick={() => toogleEdit(id)} variant="text">
+                      <BsThreeDotsVertical className="rotate-90 h-4 w-4" />
                     </IconButton>
-                    <Card onClick={() => toogleEdit(index)} className={` ${identifier === index ? "block" : "hidden"} ${isLast ? "-top-20" : "top-0"} right-20 z-50 absolute w-[135px]`}>
-                      <List className="w-[120px] text-xs "> <ListItem className="text-xs w-[120px]  ">
-                        <ListItemPrefix >
-                          <IoEyeOutline />
-                        </ListItemPrefix>
-                        Ver
-
-                      </ListItem >
-                        <ListItem className=" w-[120px]   text-xs"> <ListItemPrefix >
-                          <GoPencil />
-                        </ListItemPrefix>Editar</ListItem>
-                        <ListItem onClick={ () => deleteData(index)}  className=" text-xs w-[120px] font-semibold "> <ListItemPrefix >
-                          <BsFillTrashFill />
-                        </ListItemPrefix>Excluir</ListItem>
+                    <Card
+                      onClick={() => toogleEdit(id)}
+                      className={`${
+                        selectedUserId === id ? "block" : "hidden"
+                      } ${
+                        isLast ? "-top-20" : "top-0"
+                      } right-16 absolute w-[135px]`}
+                    >
+                      <List className="w-[120px] text-xs">
+                        <ListItem
+                          onClick={() =>
+                            handleOpen({
+                              avatar,
+                              name,
+                              email,
+                              dataDeRegistro: date,
+                            })
+                          }
+                          className="w-[120px] text-xs"
+                        >
+                          <ListItemPrefix>
+                            <IoEyeOutline />
+                          </ListItemPrefix>
+                          var
+                        </ListItem>
+                        <ListItem
+                          onClick={() =>handleGenerate(student.id)}
+                          className="text-xs w-[120px] font-semibold"
+                        >
+                          <ListItemPrefix>
+                            <BsFillTrashFill />
+                          </ListItemPrefix>
+                          Gerar
+                        </ListItem>
                       </List>
                     </Card>
-
                   </td>
                 </tr>
               );
             })}
           </tbody>
         </table>
-      
       </Card>
+      <CertificateDialog
+        open={open}
+        onClose={handleClose}
+        onButtonClick={handleExport}
+      />
       <CardFooter className="flex items-center justify-between w-full border-t border-blue-gray-50 p-4">
         <Typography variant="small" color="blue-gray" className="font-normal">
-        Página {currentPage} de {totalPages}
+          Página {currentPage} de {totalPages}
         </Typography>
         <div className="flex gap-2">
           <Button
@@ -188,7 +292,9 @@ function Ranking() {
           <Button
             variant="outlined"
             size="sm"
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
             disabled={currentPage === totalPages}
           >
             Próxima
@@ -196,7 +302,7 @@ function Ranking() {
         </div>
       </CardFooter>
     </div>
-  )
+  );
 }
 
-export default Ranking
+export default Ranking;

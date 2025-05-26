@@ -1,5 +1,6 @@
 /* eslint-disable react/jsx-no-comment-textnodes */
 import React from "react";
+import { AvatarEditorDialogProvider } from "./components/AvatarEditorDialog/AvatarEditorDialogContext";
 
 import { Toaster } from "react-hot-toast";
 import Routes from "./routes/router";
@@ -7,10 +8,10 @@ import Routes from "./routes/router";
 
 function App() {
   return (
-    <div>
+    <AvatarEditorDialogProvider>
       <Toaster />
          <Routes/>
-      </div>
+      </AvatarEditorDialogProvider>
   );
 }
 
