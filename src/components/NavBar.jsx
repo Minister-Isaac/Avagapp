@@ -42,9 +42,9 @@ const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
         axios_instance
-          .get("api/notifications")
+          .get("api/notifications/unread-count/")
           .then((res) => {
-            const response = res.data.length;
+            const response = res.data.unread_count || 0;
             setNotifications(response);
           })
           .catch((err) => {
