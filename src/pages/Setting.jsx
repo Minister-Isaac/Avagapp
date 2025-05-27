@@ -137,8 +137,7 @@ function Setting() {
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
     } catch (error) {
-      console.error("Erro ao enviar notificação:", error);
-      alert("Falha ao enviar a notificação. Tente novamente.");
+      // console.error("Erro ao enviar notificação:", error);
     } finally {
       setSendNotifyModal(false);
       setIsLoading(false);
@@ -580,7 +579,14 @@ function Setting() {
             <div className="bg-gray-50 px-6 py-4 border-t">
               <div className="flex justify-between items-center">
                 <div className="text-sm text-gray-500">
-                  Data de criação: {new Date().toLocaleDateString('pt-BR')}
+                  Data de criação:  {new Date(selectedMessage.created_at).toLocaleString('pt-BR', {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: false,
+})}
                 </div>
                 <button
                   onClick={closeMessageDetail}

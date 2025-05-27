@@ -32,7 +32,7 @@ axios_instance.interceptors.request.use(
       timestamp: new Date().toISOString(),
     };
 
-    console.error(`❌ Request Error: ${JSON.stringify(log_, null, 4)} \n`);
+    // console.error(`❌ Request Error: ${JSON.stringify(log_, null, 4)} \n`);
 
     return Promise.reject(error);
   }
@@ -63,7 +63,7 @@ axios_instance.interceptors.response.use(
       timestamp: new Date().toISOString(),
     };
 
-    console.error(`❌ Response Error: ${JSON.stringify(log_, null, 4)} \n`);
+    // console.error(`❌ Response Error: ${JSON.stringify(log_, null, 4)} \n`);
 
     return Promise.reject(error);
   }
