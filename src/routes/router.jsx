@@ -18,7 +18,7 @@ import Ranking from "../pages/teacher/Ranking";
 import StudentRanking from "../pages/student/Ranking";
 import Game from "../pages/teacher/Game";
 import GameDetails from "../pages/GameDetails";
-import GameCreate from "../pages/teacher/GameCreate";
+// import GameCreate from "../pages/teacher/GameCreate";
 import AdminHome from "../pages/admin/AdminHome";
 import TeacherManagement from "../pages/admin/TeacherManagement";
 // import AdminKnowledge from "../pages/admin/AdminKnowledge";
