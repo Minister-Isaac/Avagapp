@@ -52,7 +52,7 @@ const [notifications, setNotifications] = useState([]);
           });
     }, []);
   return (
-    <div className="px-3 py-3 flex shadow relative justify-between">
+    <div className="px-3 flex shadow relative justify-between py-3">
       <div className="flex text-accent items-center justify-center w-[30%]">
         {/* <CgMenuLeft
           onClick={toggleMobile}
