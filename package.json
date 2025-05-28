@@ -14,7 +14,6 @@
     "@emotion/styled": "^11.14.0",
     "@material-tailwind/react": "^2.1.10",
     "@mui/material": "^7.1.0",
-    "avataaars": "^2.0.0",
     "axios": "^1.7.9",
     "dnd-multi-backend": "^8.0.3",
     "formik": "^2.4.6",

@@ -41,7 +41,7 @@ function StudentGameDetails() {
         {play ? <GameThree />
           : <Game4 />}    </div>
     );
-  } else if (gameType === "Quiz") {
+  } else if (gameType === "quiz") {
     return (
      <div>
        { play?<QuizGameTwo student_id={student_id}/> :  <Game1 />}

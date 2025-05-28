@@ -52,9 +52,9 @@ const [notifications, setNotifications] = useState([]);
           });
     }, []);
   return (
-    <div className="px-3 flex shadow relative justify-between">
+    <div className="px-3 py-3 flex shadow relative justify-between">
       <div className="flex text-accent items-center justify-center w-[30%]">
-        <CgMenuLeft
+        {/* <CgMenuLeft
           onClick={toggleMobile}
           color="black"
           size={35}
@@ -67,7 +67,7 @@ const [notifications, setNotifications] = useState([]);
           className="text-accent 2xl:px-[18px] lg:px-[10px] px-[7px] 2xl:placeholder:text-base lg:placeholder:text-sm text-sm 2xl:text-base placeholder:text-accent border-none active:border-none outline-none rounded-lg 2xl:rounded-xl w-full py-3 2xl:py-4"
           id="name"
         />
-        <FiSearch size={16} className="text-black/30" />
+        <FiSearch size={16} className="text-black/30" /> */}
       </div>
 
       <div className="flex  justify-center items-center gap-3">
