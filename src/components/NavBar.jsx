@@ -12,7 +12,7 @@ import axios_instance from "../utils/axios";
 export default function NavBar() {
 
   const profile = getUserProfile();
-  const name = profile?.first_name + " " + profile.last_name || "User";
+  const name = profile?.first_name + " " + profile?.last_name || "User";
   const avatar = profile?.avatar || null;
   const navigate = useNavigate();
   const location = useLocation();

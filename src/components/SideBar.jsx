@@ -22,7 +22,7 @@ export default function TSideBar() {
 
   const pathSegments = location.pathname.split("/");
   const sideLinks =
-    userProfile.role === "teacher"
+    userProfile?.role === "teacher"
       ? [
           { label: "Início", inActive: <MdHome />, path: "/teacher/dashboard" },
           { label: "Alunos", inActive: <FaUserAlt />, path: "/teacher/dashboard/Students" },
@@ -31,7 +31,7 @@ export default function TSideBar() {
           // { label: "Ranking", inActive: <LiaClipboardListSolid />, path: "/teacher/dashboard/ranking" },
           { label: "Jogos", inActive: <IoGameController />, path: "/teacher/dashboard/game" },
         ]
-      : userProfile.role === "student"
+      : userProfile?.role === "student"
       ? [
           { label: "Início", inActive: <MdHome />, path: "/student/dashboard" },
           { label: "Conhecimento", inActive: <ImBook />, path: "/student/dashboard/knowledge" },
@@ -54,9 +54,9 @@ export default function TSideBar() {
       label: "Configurações",
       inActive: <AiFillSetting />,
       path:
-        userProfile.role === "teacher"
+        userProfile?.role === "teacher"
           ? "/teacher/dashboard/setting"
-          : userProfile.role === "student"
+          : userProfile?.role === "student"
           ? "/student/dashboard/setting"
           : "/admin/dashboard/setting",
     },
@@ -130,7 +130,7 @@ export default function TSideBar() {
       ></div>
 
       <div
-        className={`fixed top-0 left-0 z-50 h-screen w-[80%] sm:w-[60%] bg-bg p-4 transform transition-transform duration-300 ${
+        className={`overflow-y-auto fixed top-0 left-0 z-50 h-screen w-[80%] sm:w-[60%] bg-bg p-4 transform transition-transform duration-300 ${
           showMobile ? "translate-x-0" : "-translate-x-full"
         } lg:hidden`}
       >
@@ -138,10 +138,16 @@ export default function TSideBar() {
           onClick={() => setShowMobile(false)}
           className="size-8 absolute top-3 right-3 text-black"
         />
-        <div className="flex flex-col items-center">
-          <img src="/teacher/avag.png" className="size-[110px]" alt="" />
-        </div>
+       <div className="flex flex-col items-center">
+  <img 
+    src="/teacher/avag.png" 
+    alt="Teacher Avatar" 
+    className="w-20 h-20 sm:w-[90px] sm:h-[90px] md:w-[110px] md:h-[110px] object-cover"
+  />
+</div>
+
         <div className="h-full flex flex-col justify-between pt-4">{renderLinks()}</div>
+        
       </div>
 
       {/* Desktop Sidebar */}
@@ -153,6 +159,8 @@ export default function TSideBar() {
           {renderLinks()}
         </div>
       </div>
+
+      
     </>
   );
 }

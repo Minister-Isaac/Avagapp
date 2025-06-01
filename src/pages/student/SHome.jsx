@@ -54,7 +54,7 @@ export default function SHome() {
     <div className="pr-4 px-3 lg:px-0 flex flex-col gap-4">
       <div className="flex items-center">
         <h1 className="text-center -mb-1 text-2xl font-bold">
-          Olá, {profile.first_name} {profile.last_name}
+          Olá, {profile?.first_name} {profile?.last_name}
         </h1>
         <img src="/teacher/avatar.png" className="size-12" />
       </div>
@@ -66,11 +66,15 @@ export default function SHome() {
             key={id}
             className="flex p-5 gap-3 bg-main-light justify-start items-center rounded-lg"
           >
-            <div className="bg-[#A9E8FF] p-2 rounded-full">
-                 <img src='/teacher/thumb.png' alt={card.label} className="w-8 h-8" />
-            </div>
+            <div className="bg-[#A9E8FF] p-2 rounded-full w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center">
+  <img src="/teacher/thumb.png" alt={card.label} className="w-6 h-6 sm:w-8 sm:h-8 object-contain" />
+</div>
+
             <div>
-              <p className="font-semibold text-xl capitalize">{card.label}</p>
+              <p className="font-semibold text-base sm:text-lg md:text-xl lg:text-2xl capitalize">
+  {card.label}
+</p>
+
               <div className="flex gap-2 items-center">
                 <p>{card.count}</p>
                 <span

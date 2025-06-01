@@ -48,7 +48,7 @@ axios_instance.interceptors.response.use(
       data: response.data,
       timestamp: new Date().toISOString(),
     };
-    // infoCommand(`✅ Request Successful: ${JSON.stringify(log_, null, 4)} \n`);
+    infoCommand(`✅ Request Successful: ${JSON.stringify(log_, null, 4)} \n`);
 
     return response;
   },
@@ -63,7 +63,7 @@ axios_instance.interceptors.response.use(
       timestamp: new Date().toISOString(),
     };
 
-    // console.error(`❌ Response Error: ${JSON.stringify(log_, null, 4)} \n`);
+    console.error(`❌ Response Error: ${JSON.stringify(log_, null, 4)} \n`);
 
     return Promise.reject(error);
   }
