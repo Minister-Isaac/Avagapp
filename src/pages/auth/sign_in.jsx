@@ -67,6 +67,7 @@ export default function SignIn() {
       })
       .catch((error) => {
         const fallbackMessage = "Erro desconhecido";
+        console.error("Login error:", error);
         const errorMessage =
           error?.response?.data?.non_field_errors?.[0] ||
           error?.response?.data?.detail ||

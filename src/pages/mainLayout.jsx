@@ -7,7 +7,7 @@ function MainLayout() {
   return (
     <div className="flex w-full h-screen">
         <SideBar />
-        <main className="overflow-y-auto w-full bg-white">
+        <main className="overflow-y-auto w-full bg-white lg:mt-0 mt-16">
           <NavBar />
           <Outlet />
         </main>
