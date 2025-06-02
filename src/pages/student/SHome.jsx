@@ -61,8 +61,8 @@ export default function SHome() {
         <img src="/teacher/avatar.png" className="size-12" />
       </div>
 
-      <div className="grid gap-3 lg:grid-cols-3">
-        <div className="grid col-span-2 gap-3 grid-cols-1">
+      <div className="grid gap-3 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:col-span-2">
           {data.map((card, id) => (
             <div
               key={id}
