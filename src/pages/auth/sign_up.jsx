@@ -70,10 +70,7 @@ export default function Signup() {
 
       {/* Right Form Section - offset to the right */}
       <div className="lg:ml-[25.5%] flex-1 p-4 md:px-12 xl:px-24 2xl:px-32 flex flex-col items-center justify-start pt-10 lg:pt-0 overflow-auto">
-        {/* <div className="flex mb-5 lg:mb-0 w-full items-center justify-center">
-          <h1 className="text-main-dark text-3xl font-semibold 2xl:text-5xl">Bem-vindo</h1>
-          <img src="/teacher/hand.png" className="mx-auto mt-2 size-16 lg:size-20" alt="Hand" />
-        </div> */}
+        
         <div className="flex mb-5 lg:mb-0 w-full items-center justify-center">
           <h1 className="text-main-dark text-3xl font-semibold 2xl:text-5xl">
             Bem-vindo

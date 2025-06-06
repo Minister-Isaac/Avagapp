@@ -114,7 +114,6 @@ function Students() {
         handleOpen={toggleModal}
         requestType={modalType}
         userId={selectedUserId}
-        apiEndpoint="users/sign-up/"
         data={selectedUser}
       />
 

@@ -22,7 +22,7 @@ import GameDetails from "../pages/GameDetails";
 import AdminHome from "../pages/admin/AdminHome";
 import TeacherManagement from "../pages/admin/TeacherManagement";
 // import AdminKnowledge from "../pages/admin/AdminKnowledge";
-import AdminRanking from "../pages/admin/AdminRanking";
+// import AdminRanking from "../pages/admin/AdminRanking";
 import SHome from "../pages/student/SHome";
 import ClassOverViewDetails from "../pages/ClassOverViewDetails";
 import StudentKnowledge from "../pages/student/StudentKnowledge";
@@ -90,7 +90,7 @@ export default function RouterComponent() {
           <Route path="students" element={<Student />} />
           <Route path="knowledge" element={<Knowledge />} />
           <Route path="knowledge/knowledge-details/:id" element={<ClassOverViewDetails />} />
-          <Route path="ranking" element={<AdminRanking />} />
+          <Route path="ranking" element={<Ranking />} />
           <Route path="game" element={<Game />} />
           <Route path="game/:gameType" element={<GameDetails />} />
           <Route path="setting" element={<Setting />} />

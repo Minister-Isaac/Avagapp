@@ -10,6 +10,7 @@ import React, { useState, useEffect } from "react";
 import axios_instance from "../../utils/axios";
 import ViewProfileModal from "../../components/teacher/ViewStudentProfileModal";
 import { TABLE_HEAD3 } from "../../../helper/data";
+import UserModal from "../../components/teacher/usermodal";
 
 function TeacherManagement() {
   const [Data, setData] = useState([]);
@@ -20,6 +21,9 @@ function TeacherManagement() {
   const currentData = Data.slice(startIndex, startIndex + ITEMS_PER_PAGE);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [modalType, setModalType] = useState("post");
+  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [open, setOpen] = useState(false);
 
   const handleOpen = (userdata) => {
     setSelectedUser(userdata);
@@ -38,13 +42,36 @@ function TeacherManagement() {
 
     fetchTeachers();
   }, []);
-
+  const toggleModal = () => {
+    setOpen(!open);
+    if (open) {
+      setModalType("post");
+      setSelectedUser(null);
+      setSelectedUserId(null);
+    }
+  };
   return (
     <div className="flex pt-5 px-3 flex-col gap-4">
-      <div className="flex justify-between p-2 items-center text-white">
-        <p className="font-bold text-[28px] text-black">Gestão de Usuários</p>
+      <div className="flex justify-between p-2 gap-3 items-center text-white">
+        <p className="font-bold lg:text-[28px] text-black">
+          Gestão de Usuários
+        </p>
+        <p
+          onClick={toggleModal}
+          className="flex cursor-pointer p-[6px] lg:p-[10px] text-center items-center rounded-lg lg:rounded-2xl gap-2 bg-main-dark"
+        >
+          Adicionar Novo Usuário
+        </p>
       </div>
 
+      <UserModal
+        open={open}
+        handleOpen={toggleModal}
+        requestType={modalType}
+        userId={selectedUserId}
+        data={selectedUser}
+        usertype="teacher"
+      />
       <Card className="h-full lg:overflow-hidden overflow-x-scroll w-full px-6">
         <table className="w-full min-w-max table-auto text-left">
           <thead>

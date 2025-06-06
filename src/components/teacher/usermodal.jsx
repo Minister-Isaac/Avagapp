@@ -8,9 +8,9 @@ export default function UserModal({
   open,
   handleOpen,
   requestType = "post",
-  apiEndpoint = "users/sign-up/",
   userId = null,
   data = null, // pre-filled data for edit
+  usertype
 }) {
   const [formData, setFormData] = useState({
     first_name: "",
@@ -18,7 +18,7 @@ export default function UserModal({
     email: "",
     password: "",
     confirm_password: "",
-    role: "student",
+    role: usertype == 'teacher' ?"teacher" : "student",
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -40,7 +40,7 @@ export default function UserModal({
         email: "",
         password: "",
         confirm_password: "",
-        role: "student",
+        role: usertype == 'teacher' ?"teacher" : "student",
       });
     }
   }, [open, requestType, data]);
@@ -62,9 +62,9 @@ export default function UserModal({
 
       const dataToSend = { ...formData };
     console.log(dataToSend)
-      let endpoint = apiEndpoint;
+      let endpoint = 'api/users/sign-up/';
       if ((requestType === "put" || requestType === "patch") && userId !== null) {
-        endpoint = `${apiEndpoint}/${userId}`;
+        endpoint = `${'api/users/sign-up/'}/${userId}`;
       }
 
       const response = await axios_instance[requestType](endpoint, dataToSend);
@@ -108,9 +108,9 @@ export default function UserModal({
         mount: { scale: 1, y: 0 },
         unmount: { scale: 0.9, y: -100 },
       }}
-      className="p-3 border-2 border-main-dark"
+      className="p-3 border-2 border-main-dark overflow-scroll h-[500px]"
     >
-      <h1 className="text-2xl font-num font-bold text-main-dark mb-3">
+      <h1 className="text-2xl font-num font-bold text-main-dark mb-3 text-center">
         {requestType === "post" ? "Adicionar Novo Usuário" : "Atualizar Usuário"}
       </h1>
 
@@ -132,6 +132,7 @@ export default function UserModal({
                 placeholder={field.replace("_", " ")}
                 autoComplete="off"
                 className="text-main-dark/70 mt-2 px-3 placeholder:text-sm text-sm border-none outline-none bg-input rounded-lg w-full py-3"
+               required
               />
             </label>
           ))}
@@ -148,6 +149,7 @@ export default function UserModal({
             placeholder="Email"
             autoComplete="off"
             className="text-main-dark/70 mt-2 px-3 placeholder:text-sm text-sm border-none outline-none bg-input rounded-lg w-full py-3"
+            required
           />
         </label>
 
@@ -156,6 +158,48 @@ export default function UserModal({
           {renderPasswordField("password", "Senha", showPassword, setShowPassword)}
           {renderPasswordField("confirm_password", "Confirmar Senha", showConfirm, setShowConfirm)}
         </div>
+
+{/* Role & Experience */}
+          <div className="flex flex-col md:flex-row gap-4">
+
+            {usertype === "teacher" && (
+              <label
+                htmlFor="experience_years"
+                className="font-medium text-lg text-main-dark"
+              >
+                Anos de Experiência
+                <input
+                  type="number"
+                  id="experience_years"
+                  min={0}
+                  value={formData.experience_years || ""}
+                  onChange={handleChange}
+                  placeholder="Anos de Experiência"
+                  className="text-main-dark/70 lg:mt-[10px] mt-[7px] 2xl:px-[18px] lg:px-[10px] px-[7px] 2xl:placeholder:text-base lg:placeholder:text-sm text-sm 2xl:text-base placeholder:text-main-dark/70 border-none active:border-none outline-none bg-input rounded-lg 2xl:rounded-xl w-full py-3 2xl:py-4"
+                  required
+                />
+              </label>
+            )}
+          </div>
+
+          {/* Subject Taught */}
+          {usertype === "teacher" && (
+            <label
+              htmlFor="subject_taught"
+              className="relative font-medium text-main-dark"
+            >
+              Matéria
+              <input
+                type="text"
+                id="subject_taught"
+                value={formData.subject_taught || ""}
+                onChange={handleChange}
+                placeholder="Matéria"
+                className="text-main-dark/70 lg:mt-[10px] mt-[7px] 2xl:px-[18px] lg:px-[10px] px-[7px] 2xl:placeholder:text-base lg:placeholder:text-sm text-sm 2xl:text-base placeholder:text-main-dark/70 border-none active:border-none outline-none bg-input rounded-lg 2xl:rounded-xl w-full py-3 2xl:py-4"
+                required
+              />
+            </label>
+          )}
 
         {/* Submit Button */}
         <button
